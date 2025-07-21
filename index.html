@@ -12,7 +12,7 @@
     }
 
     .container {
-      max-width: 600px;
+      max-width: 700px;
       background-color: #fff;
       margin: 50px auto;
       padding: 30px;
@@ -42,9 +42,17 @@
       box-sizing: border-box;
     }
 
+    .setor {
+      margin-top: 30px;
+      padding: 15px;
+      border: 2px solid #eee;
+      border-radius: 10px;
+      background-color: #fafafa;
+    }
+
     .item {
-      margin-top: 15px;
-      border-top: 1px solid #eee;
+      margin-top: 10px;
+      border-top: 1px solid #ddd;
       padding-top: 10px;
     }
 
@@ -67,77 +75,106 @@
     button:hover {
       background-color: #45a049;
     }
+
+    .item-buttons {
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <h2>Solicitação de Pedido Extra</h2>
+<div class="container">
+  <h2>Solicitação de Pedido Extra</h2>
 
-    <form id="pedidoForm">
-      <label for="solicitante">Nome do Solicitante:</label>
-      <input type="text" id="solicitante" required>
+  <form id="pedidoForm">
+    <label for="solicitante">Nome do Solicitante:</label>
+    <input type="text" id="solicitante" required>
 
-      <label for="unidade">Unidade Solicitante:</label>
-      <input type="text" id="unidade" required>
+    <label for="unidade">Unidade Solicitante:</label>
+    <input type="text" id="unidade" required>
 
-      <label for="setor">Setor:</label>
-      <input type="text" id="setor" required>
+    <div id="setoresContainer"></div>
 
-      <div id="itens">
+    <div class="buttons">
+      <button type="button" onclick="adicionarSetor()">+ Adicionar Novo Setor</button>
+      <button type="submit">Enviar Pedido</button>
+    </div>
+  </form>
+</div>
+
+<!-- Lista de sugestões -->
+<datalist id="lista-itens">
+  <option value="1010300099 DIPIRONA COMPRIMIDO">
+  <option value="1010300048 DIPIRONA GOTAS">
+  <option value="1010300056 DIPIRONA SÓDICA 500MG/ML AMPOLA">
+  <option value="Seringa 5ml">
+  <option value="Seringa 10ml">
+  <option value="Algodão">
+  <option value="Gaze estéril">
+  <option value="Esparadrapo">
+  <option value="Termômetro digital">
+</datalist>
+
+<script>
+  let setorIndex = 0;
+
+  function adicionarSetor() {
+    const container = document.getElementById('setoresContainer');
+
+    const div = document.createElement('div');
+    div.className = 'setor';
+    div.setAttribute('data-setor-index', setorIndex);
+
+    div.innerHTML = `
+      <label>Setor:</label>
+      <input type="text" name="setor" required>
+
+      <div class="itens" id="itens-${setorIndex}">
         <div class="item">
           <label>Item:</label>
           <input type="text" class="item-nome" list="lista-itens" required>
-
           <label>Quantidade:</label>
           <input type="number" class="item-qtd" required>
         </div>
       </div>
 
-      <!-- Lista de sugestões -->
-      <datalist id="lista-itens">
-        <option value="1010300099 DIPIRONA COMPRIMIDO">
-        <option value="1010300048 DIPIRONA GOTAS">
-        <option value="1010300056 DIPIRONA SÓDICA 500MG/ML AMPOLA">
-        <option value="Seringa 5ml">
-        <option value="Seringa 10ml">
-        <option value="Algodão">
-        <option value="Gaze estéril">
-        <option value="Esparadrapo">
-        <option value="Termômetro digital">
-      </datalist>
-
-      <div class="buttons">
-        <button type="button" onclick="adicionarItem()">+ Adicionar Item</button>
-        <button type="submit">Enviar Pedido</button>
+      <div class="item-buttons">
+        <button type="button" onclick="adicionarItem(${setorIndex})">+ Adicionar Item</button>
       </div>
-    </form>
-  </div>
+    `;
 
-  <script>
-    function adicionarItem() {
-      const novoItem = document.createElement('div');
-      novoItem.classList.add('item');
-      novoItem.innerHTML = `
-        <label>Item:</label>
-        <input type="text" class="item-nome" list="lista-itens" required>
+    container.appendChild(div);
+    setorIndex++;
+  }
 
-        <label>Quantidade:</label>
-        <input type="number" class="item-qtd" required>
-      `;
-      document.getElementById('itens').appendChild(novoItem);
-    }
+  function adicionarItem(index) {
+    const container = document.getElementById(`itens-${index}`);
+    const div = document.createElement('div');
+    div.className = 'item';
+    div.innerHTML = `
+      <label>Item:</label>
+      <input type="text" class="item-nome" list="lista-itens" required>
+      <label>Quantidade:</label>
+      <input type="number" class="item-qtd" required>
+    `;
+    container.appendChild(div);
+  }
 
-    document.getElementById('pedidoForm').addEventListener('submit', function(e) {
-      e.preventDefault();
+  document.getElementById('pedidoForm').addEventListener('submit', function(e) {
+    e.preventDefault();
 
-      const solicitante = document.getElementById('solicitante').value;
-      const unidade = document.getElementById('unidade').value;
-      const setor = document.getElementById('setor').value;
-      const itensNomes = document.querySelectorAll('.item-nome');
-      const itensQtds = document.querySelectorAll('.item-qtd');
+    const solicitante = document.getElementById('solicitante').value;
+    const unidade = document.getElementById('unidade').value;
+    const setores = document.querySelectorAll('.setor');
 
-      let corpoEmail = `Solicitante: ${solicitante}\nUnidade: ${unidade}\nSetor: ${setor}\n\nItens Solicitados:\n`;
+    let corpoEmail = `Solicitante: ${solicitante}\nUnidade: ${unidade}\n\n`;
+
+    setores.forEach(setor => {
+      const nomeSetor = setor.querySelector('input[name="setor"]').value;
+      corpoEmail += `Setor: ${nomeSetor}\n`;
+
+      const itensNomes = setor.querySelectorAll('.item-nome');
+      const itensQtds = setor.querySelectorAll('.item-qtd');
 
       itensNomes.forEach((input, index) => {
         const nome = input.value;
@@ -145,10 +182,16 @@
         corpoEmail += `- ${nome} (Qtd: ${qtd})\n`;
       });
 
-      const mailto = `mailto:leitaoochefe@gmail.com?subject=Pedido Extra - ${encodeURIComponent(unidade)}&body=${encodeURIComponent(corpoEmail)}`;
-      window.location.href = mailto;
+      corpoEmail += `\n`;
     });
-  </script>
+
+    const mailto = `mailto:leitaoochefe@gmail.com?subject=Pedido Extra - ${encodeURIComponent(unidade)}&body=${encodeURIComponent(corpoEmail)}`;
+    window.location.href = mailto;
+  });
+
+  // Cria o primeiro setor automaticamente
+  window.onload = adicionarSetor;
+</script>
 
 </body>
 </html>
