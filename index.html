@@ -116,6 +116,21 @@
 
   <script>
     function adicionarItem() {
+  const novoItem = document.createElement('div');
+  novoItem.classList.add('item');
+  novoItem.innerHTML = `
+    <label>Item:</label>
+    <input type="text" class="item-nome" list="lista-itens" required>
+
+    <label>Quantidade:</label>
+    <input type="number" class="item-qtd" required>
+
+    <label>Observação:</label>
+    <textarea class="item-obs" rows="3" maxlength="1000" placeholder="Escreva uma observação (máx. 1000 caracteres)"></textarea>
+  `;
+  document.getElementById('itens').appendChild(novoItem);
+}
+
       const novoItem = document.createElement('div');
       novoItem.classList.add('item');
       novoItem.innerHTML = `
