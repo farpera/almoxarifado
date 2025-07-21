@@ -86,26 +86,26 @@
 
       <div id="itens">
         <div class="item">
-        
-         <label>Item:</label>
-<input type="text" class="item-nome" list="lista-itens" required>
-<datalist id="lista-itens">
-  <option value="Luvas de procedimento">
-  <option value="Álcool 70%">
-  <option value="Máscara cirúrgica">
-  <option value="Seringa 5ml">
-  <option value="Seringa 10ml">
-  <option value="Algodão">
-  <option value="Gaze estéril">
-  <option value="Esparadrapo">
-  <option value="Termômetro digital">
-</datalist>
-
+          <label>Item:</label>
+          <input type="text" class="item-nome" list="lista-itens" required>
 
           <label>Quantidade:</label>
           <input type="number" class="item-qtd" required>
         </div>
       </div>
+
+      <!-- Lista de sugestões -->
+      <datalist id="lista-itens">
+        <option value="Luvas de procedimento">
+        <option value="Álcool 70%">
+        <option value="Máscara cirúrgica">
+        <option value="Seringa 5ml">
+        <option value="Seringa 10ml">
+        <option value="Algodão">
+        <option value="Gaze estéril">
+        <option value="Esparadrapo">
+        <option value="Termômetro digital">
+      </datalist>
 
       <div class="buttons">
         <button type="button" onclick="adicionarItem()">+ Adicionar Item</button>
@@ -120,7 +120,7 @@
       novoItem.classList.add('item');
       novoItem.innerHTML = `
         <label>Item:</label>
-        <input type="text" class="item-nome" required>
+        <input type="text" class="item-nome" list="lista-itens" required>
 
         <label>Quantidade:</label>
         <input type="number" class="item-qtd" required>
