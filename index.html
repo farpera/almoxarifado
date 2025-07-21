@@ -107,14 +107,7 @@
       novoItem.classList.add('item');
       novoItem.innerHTML = `
         <label>Item:</label>
-        <select class="item-nome" required>
-  <option value="">Selecione um item</option>
-  <option value="Álcool 70%">Álcool 70%</option>
-  <option value="Luvas de Procedimento">Luvas de Procedimento</option>
-  <option value="Seringa 10ml">Seringa 10ml</option>
-  <option value="Gaze Estéril">Gaze Estéril</option>
-  <option value="Máscara Cirúrgica">Máscara Cirúrgica</option>
-</select>
+        <input type="text" class="item-nome" required>
 
         <label>Quantidade:</label>
         <input type="number" class="item-qtd" required>
