@@ -11,12 +11,12 @@
       --primary-hover-color: #004182;
       --danger-color: #e53e3e;
       --danger-hover-color: #c53030;
-      --background-light: #1a1a2e;
-      --background-white: #16213e;
+      --background-light: #2a2a3a;
+      --background-white: #2d3748;
       --text-dark: #ffffff;
-      --text-medium: #b8b8b8;
-      --border-light: #2a2a3a;
-      --shadow-light: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+      --text-medium: #cbd5e0;
+      --border-light: #4a5568;
+      --shadow-light: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
       --transition-all: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
@@ -335,28 +335,56 @@
     const unidade = document.getElementById('unidade').value;
     const setores = document.querySelectorAll('.setor');
 
-    let corpoEmail = `Solicitante: ${solicitante}\nUnidade: ${unidade}\n\n`;
+    let corpoEmailHTML = `
+      <html>
+      <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+        <p><strong>Solicitante:</strong> ${solicitante}</p>
+        <p><strong>Unidade:</strong> ${unidade}</p>
+        <br>
+    `;
 
     setores.forEach(setor => {
       const nomeSetor = setor.querySelector('input[name="setor"]').value;
-      corpoEmail += `Setor: ${nomeSetor}\n`;
+      corpoEmailHTML += `
+        <div style="margin-top: 20px;">
+          <p style="font-weight: bold; text-decoration: underline; margin-bottom: 10px;">
+            SETOR: ${nomeSetor}
+          </p>
+          <ul style="margin-top: 5px; margin-bottom: 20px; padding-left: 20px;">
+      `;
 
       const itensNomes = setor.querySelectorAll('.item-nome');
       const itensQtds = setor.querySelectorAll('.item-qtd');
 
       if (itensNomes.length === 0) {
-          corpoEmail += `  (Nenhum item neste setor)\n`;
+          corpoEmailHTML += `<li>(Nenhum item neste setor)</li>`;
       } else {
           itensNomes.forEach((input, index) => {
             const nome = input.value;
             const qtd = itensQtds[index].value;
-            corpoEmail += `- ${nome} (Qtd: ${qtd})\n`;
+            corpoEmailHTML += `<li>${nome} (Qtd: ${qtd})</li>`;
           });
       }
-      corpoEmail += `\n`;
+      
+      corpoEmailHTML += `
+          </ul>
+        </div>
+      `;
     });
 
-    const mailto = `mailto:leitaoochefe@gmail.com?subject=Pedido Extra - ${encodeURIComponent(unidade)}&body=${encodeURIComponent(corpoEmail)}`;
+    corpoEmailHTML += `
+        </body>
+      </html>
+    `;
+
+    // Codifica o corpo do e-mail para URI
+    const corpoCodificado = encodeURIComponent(corpoEmailHTML)
+      .replace(/%0A/g, '%0D%0A')  // Garante quebras de linha corretas
+      .replace(/%20/g, ' ')       // Melhora legibilidade do código
+      .replace(/'/g, '%27')       // Codifica aspas simples
+      .replace(/"/g, '%22');      // Codifica aspas duplas
+
+    const mailto = `mailto:leitaoochefe@gmail.com?subject=Pedido Extra - ${encodeURIComponent(unidade)}&body=${corpoCodificado}`;
     window.location.href = mailto;
   });
 
