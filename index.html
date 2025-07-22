@@ -87,6 +87,22 @@
       background-color: rgba(255, 255, 255, 0.15);
     }
 
+    /* ✅ Corrigir fundo branco ao digitar/usar preenchimento automático */
+    input:-webkit-autofill {
+      -webkit-box-shadow: 0 0 0px 1000px rgba(255, 255, 255, 0.1) inset !important;
+      -webkit-text-fill-color: var(--text-dark) !important;
+      transition: background-color 5000s ease-in-out 0s;
+    }
+
+    input:-webkit-autofill:focus {
+      -webkit-box-shadow: 0 0 0px 1000px rgba(255, 255, 255, 0.15) inset !important;
+    }
+
+    input:-internal-autofill-selected {
+      background-color: rgba(255, 255, 255, 0.1) !important;
+      color: var(--text-dark) !important;
+    }
+
     .setor {
       margin-top: 40px;
       padding: 30px;
@@ -289,7 +305,6 @@
       <button type="button" onclick="removerSetor(this)" class="remove-button remove-setor-button">Remover Setor</button>
 
       <div class="itens" id="itens-${setorIndex}">
-        <!-- Itens serão adicionados aqui -->
       </div>
 
       <div class="item-buttons">
@@ -335,7 +350,6 @@
     const unidade = document.getElementById('unidade').value;
     const setores = document.querySelectorAll('.setor');
 
-    // Corpo do e-mail em texto puro, sem formatação HTML
     let corpoEmail = `SOLICITAÇÃO DE PEDIDO EXTRA\n\n`;
     corpoEmail += `Solicitante: ${solicitante}\n`;
     corpoEmail += `Unidade: ${unidade}\n\n`;
