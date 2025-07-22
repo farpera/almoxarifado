@@ -335,25 +335,30 @@
     const unidade = document.getElementById('unidade').value;
     const setores = document.querySelectorAll('.setor');
 
-    let corpoEmail = `Solicitante: ${solicitante}\nUnidade: ${unidade}\n\n`;
+    // Corpo do e-mail em texto puro, sem formatação HTML
+    let corpoEmail = `SOLICITAÇÃO DE PEDIDO EXTRA\n\n`;
+    corpoEmail += `Solicitante: ${solicitante}\n`;
+    corpoEmail += `Unidade: ${unidade}\n\n`;
+    corpoEmail += `----------------------------------------\n\n`;
 
     setores.forEach(setor => {
       const nomeSetor = setor.querySelector('input[name="setor"]').value;
-      corpoEmail += `Setor: ${nomeSetor}\n`;
+      corpoEmail += `SETOR: ${nomeSetor}\n\n`;
 
       const itensNomes = setor.querySelectorAll('.item-nome');
       const itensQtds = setor.querySelectorAll('.item-qtd');
 
       if (itensNomes.length === 0) {
-          corpoEmail += `  (Nenhum item neste setor)\n`;
+          corpoEmail += `(Nenhum item neste setor)\n\n`;
       } else {
           itensNomes.forEach((input, index) => {
             const nome = input.value;
             const qtd = itensQtds[index].value;
             corpoEmail += `- ${nome} (Qtd: ${qtd})\n`;
           });
+          corpoEmail += `\n`;
       }
-      corpoEmail += `\n`;
+      corpoEmail += `----------------------------------------\n\n`;
     });
 
     const mailto = `mailto:leitaoochefe@gmail.com?subject=Pedido Extra - ${encodeURIComponent(unidade)}&body=${encodeURIComponent(corpoEmail)}`;
