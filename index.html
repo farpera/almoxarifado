@@ -11,12 +11,12 @@
       --primary-hover-color: #004182;
       --danger-color: #e53e3e;
       --danger-hover-color: #c53030;
-      --background-light: #2a2a3a;
-      --background-white: #2d3748;
+      --background-light: #1a1a2e;
+      --background-white: #16213e;
       --text-dark: #ffffff;
-      --text-medium: #cbd5e0;
-      --border-light: #4a5568;
-      --shadow-light: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+      --text-medium: #b8b8b8;
+      --border-light: #2a2a3a;
+      --shadow-light: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
       --transition-all: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
@@ -339,7 +339,7 @@
 
     setores.forEach(setor => {
       const nomeSetor = setor.querySelector('input[name="setor"]').value;
-      corpoEmail += `\n**__SETOR: ${nomeSetor}__**\n`; // Negrito e sublinhado com markdown
+      corpoEmail += `Setor: ${nomeSetor}\n`;
 
       const itensNomes = setor.querySelectorAll('.item-nome');
       const itensQtds = setor.querySelectorAll('.item-qtd');
@@ -353,6 +353,7 @@
             corpoEmail += `- ${nome} (Qtd: ${qtd})\n`;
           });
       }
+      corpoEmail += `\n`;
     });
 
     const mailto = `mailto:leitaoochefe@gmail.com?subject=Pedido Extra - ${encodeURIComponent(unidade)}&body=${encodeURIComponent(corpoEmail)}`;
