@@ -4,21 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Solicitação de Pedido Extra</title>
-  <!-- Google Fonts - Inter -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary-color: #0a66c2; /* Cor primária mais moderna (inspirado em LinkedIn) */
+      --primary-color: #0a66c2;
       --primary-hover-color: #004182;
       --danger-color: #e53e3e;
       --danger-hover-color: #c53030;
-      --background-light: #f0f4f8; /* Fundo mais suave e moderno */
-      --background-white: #ffffff;
-      --text-dark: #2d3748;
-      --text-medium: #718096;
-      --border-light: #e2e8f0;
-      --shadow-light: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Sombra mais suave e moderna */
-      --transition-all: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Transição suave */
+      --background-light: #1a1a2e;
+      --background-white: #16213e;
+      --text-dark: #ffffff;
+      --text-medium: #b8b8b8;
+      --border-light: #2a2a3a;
+      --shadow-light: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+      --transition-all: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     body {
@@ -31,21 +30,22 @@
       align-items: flex-start;
       min-height: 100vh;
       box-sizing: border-box;
+      color: var(--text-dark);
     }
 
     .container {
-      max-width: 800px; /* Aumentado para mais espaço */
+      max-width: 800px;
       width: 100%;
       background-color: var(--background-white);
-      margin: 40px auto; /* Mais margem superior */
-      padding: 50px; /* Mais padding interno */
-      border-radius: 20px; /* Bordas mais arredondadas para modernidade */
+      margin: 40px auto;
+      padding: 50px;
+      border-radius: 20px;
       box-shadow: var(--shadow-light);
       transition: var(--transition-all);
     }
 
     .container:hover {
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Efeito hover no container */
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
     }
 
     h2 {
@@ -54,7 +54,7 @@
       margin-bottom: 40px;
       font-weight: 700;
       font-size: 1.5rem;
-      letter-spacing: -0.025em; /* Espaçamento de letras moderno */
+      letter-spacing: -0.025em;
     }
 
     label {
@@ -69,13 +69,13 @@
     input[type="text"],
     input[type="number"] {
       width: 100%;
-      padding: 14px 18px; /* Mais padding para conforto */
+      padding: 14px 18px;
       border: 1px solid var(--border-light);
-      border-radius: 12px; /* Bordas mais arredondadas */
+      border-radius: 12px;
       box-sizing: border-box;
       font-size: 1rem;
       color: var(--text-dark);
-      background-color: #f7fafc; /* Fundo leve nos inputs */
+      background-color: rgba(255, 255, 255, 0.1);
       transition: var(--transition-all);
     }
 
@@ -83,8 +83,8 @@
     input[type="number"]:focus {
       outline: none;
       border-color: var(--primary-color);
-      box-shadow: 0 0 0 4px rgba(10, 102, 194, 0.1); /* Sombra de foco mais moderna */
-      background-color: #ffffff;
+      box-shadow: 0 0 0 4px rgba(10, 102, 194, 0.3);
+      background-color: rgba(255, 255, 255, 0.15);
     }
 
     .setor {
@@ -92,15 +92,15 @@
       padding: 30px;
       border: 1px solid var(--border-light);
       border-radius: 16px;
-      background-color: #f7fafc; /* Fundo mais claro e moderno */
+      background-color: rgba(0, 0, 0, 0.2);
       position: relative;
       box-shadow: var(--shadow-light);
       transition: var(--transition-all);
     }
 
     .setor:hover {
-      transform: translateY(-2px); /* Efeito de elevação ao hover */
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
     }
 
     .setor > label {
@@ -125,7 +125,17 @@
 
     .item .item-input-group {
       flex: 1;
-      min-width: 180px; /* Aumentado para melhor layout */
+    }
+
+    .item .item-input-group.item-nome-group {
+      min-width: 300px;
+      flex-grow: 2;
+    }
+
+    .item .item-input-group.item-qtd-group {
+      min-width: 120px;
+      max-width: 150px;
+      flex-grow: 1;
     }
 
     .item .item-input-group label {
@@ -155,7 +165,7 @@
     }
 
     button {
-      background: linear-gradient(135deg, var(--primary-color), var(--primary-hover-color)); /* Gradiente para modernidade */
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-hover-color));
       color: white;
       padding: 14px 30px;
       border: none;
@@ -168,8 +178,8 @@
     }
 
     button:hover {
-      transform: translateY(-3px) scale(1.02); /* Efeito de elevação e zoom sutil */
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
     }
 
     .remove-button {
@@ -189,7 +199,7 @@
       border-radius: 10px;
     }
     .remove-setor-button:hover {
-      transform: scale(1.05); /* Efeito sutil de zoom */
+      transform: scale(1.05);
     }
 
     .item-buttons {
@@ -197,7 +207,6 @@
       text-align: right;
     }
 
-    /* Animação de fade-in para novos elementos */
     .setor, .item {
       animation: fadeIn 0.5s ease-in-out;
     }
@@ -207,7 +216,6 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Responsividade */
     @media (max-width: 768px) {
       .container {
         margin: 20px;
@@ -223,6 +231,7 @@
       }
       .item .item-input-group {
         min-width: unset;
+        max-width: 100%;
       }
       .item .remove-item-button {
         margin-left: 0;
@@ -252,7 +261,6 @@
   </form>
 </div>
 
-<!-- Lista de sugestões -->
 <datalist id="lista-itens">
   <option value="1010300099 DIPIRONA COMPRIMIDO">
   <option value="1010300048 DIPIRONA GOTAS">
@@ -290,7 +298,7 @@
     `;
 
     container.appendChild(div);
-    adicionarItem(setorIndex); // Adiciona o primeiro item automaticamente ao criar o setor
+    adicionarItem(setorIndex);
     setorIndex++;
   }
 
@@ -303,11 +311,11 @@
     const div = document.createElement('div');
     div.className = 'item';
     div.innerHTML = `
-      <div class="item-input-group">
+      <div class="item-input-group item-nome-group">
         <label>Item:</label>
         <input type="text" class="item-nome" list="lista-itens" required>
       </div>
-      <div class="item-input-group">
+      <div class="item-input-group item-qtd-group">
         <label>Quantidade:</label>
         <input type="number" class="item-qtd" min="1" required>
       </div>
@@ -352,7 +360,6 @@
     window.location.href = mailto;
   });
 
-  // Cria o primeiro setor automaticamente
   window.onload = adicionarSetor;
 </script>
 
