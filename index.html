@@ -256,7 +256,7 @@
     }
   </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
 
 <div class="container">
   <h2>Solicitação de Pedido Extra</h2>
@@ -290,6 +290,36 @@
 </datalist>
 
 <script>
+  // Bloquear clique direito (context menu)
+  document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    return false;
+  });
+
+  // Bloquear F12 e combinações comuns de dev tools
+  document.addEventListener('keydown', function(e) {
+    // Bloquear F12
+    if (e.keyCode === 123) {
+      e.preventDefault();
+      return false;
+    }
+    // Bloquear Ctrl+Shift+I (Inspect)
+    if (e.ctrlKey && e.shiftKey && e.keyCode === 73) {
+      e.preventDefault();
+      return false;
+    }
+    // Bloquear Ctrl+Shift+J (Console)
+    if (e.ctrlKey && e.shiftKey && e.keyCode === 74) {
+      e.preventDefault();
+      return false;
+    }
+    // Bloquear Ctrl+U (View Source)
+    if (e.ctrlKey && e.keyCode === 85) {
+      e.preventDefault();
+      return false;
+    }
+  });
+
   let setorIndex = 0;
 
   function adicionarSetor() {
@@ -384,4 +414,3 @@
 
 </body>
 </html>
-
