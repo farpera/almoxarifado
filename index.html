@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -407,6 +408,9 @@
 
     const mailto = `mailto:leitaoochefe@gmail.com?subject=Pedido Extra - ${encodeURIComponent(unidade)}&body=${encodeURIComponent(corpoEmail)}`;
     window.location.href = mailto;
+
+    // Exibir mensagem de sucesso após acionar o mailto (assumindo que o usuário enviará o e-mail pelo cliente)
+    alert('PEDIDO ENVIADO COM SUCESSO!');
   });
 
   window.onload = adicionarSetor;
@@ -414,3 +418,4 @@
 
 </body>
 </html>
+```
