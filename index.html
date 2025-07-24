@@ -194,19 +194,25 @@
 
     .item {
       margin-top: 20px;
-      padding-top: 20px;
-      border-top: 1px dashed var(--border-light);
+      padding: 30px; /* Alinhado com .setor */
+      border: 1px solid var(--border-light); /* Alinhado com .setor */
+      border-radius: 16px; /* Alinhado com .setor */
+      background-color: rgba(0, 0, 0, 0.2); /* Alinhado com .setor */
+      position: relative; /* Mantido para consistência, mas não necessário agora */
+      box-shadow: var(--shadow-light); /* Alinhado com .setor */
+      transition: var(--transition-all); /* Alinhado com .setor */
       display: flex;
       flex-wrap: wrap;
       gap: 20px;
       align-items: flex-end;
-      transition: var(--transition-all);
     }
 
-    .item:first-of-type {
-      border-top: none;
-      padding-top: 0;
+    .item:hover {
+      transform: translateY(-2px); /* Alinhado com .setor:hover */
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3); /* Alinhado com .setor:hover */
     }
+
+    /* Removido o border-top dashed e o :first-of-type, pois agora cada item é uma caixa completa como .setor */
 
     .item .item-input-group {
       flex: 1;
@@ -235,10 +241,11 @@
 
     .item .remove-item-button {
       flex-shrink: 0;
-      margin-left: auto;
       padding: 12px 18px;
       font-size: 0.95rem;
       border-radius: 12px;
+      align-self: flex-end; /* Alinha o botão no fundo, com os inputs */
+      margin-left: 20px; /* Espaçamento à frente da quantidade */
     }
 
     .observacao-group {
@@ -324,7 +331,9 @@
       }
       .item .remove-item-button {
         margin-left: 0;
-        width: 100%;
+        margin-top: 10px; /* Ajuste para mobile, colocando abaixo */
+        width: auto;
+        align-self: flex-start; /* Ou center, se preferir */
       }
     }
   </style>
