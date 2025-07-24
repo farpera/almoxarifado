@@ -241,6 +241,10 @@
       border-radius: 12px;
     }
 
+    .observacao-group {
+      margin-top: 20px;
+    }
+
     .buttons {
       margin-top: 50px;
       text-align: center;
@@ -418,6 +422,11 @@
       <div class="itens" id="itens-${setorIndex}">
       </div>
 
+      <div class="observacao-group">
+        <label>Digite aqui a sua observação:</label>
+        <input type="text" class="observacao" maxlength="70">
+      </div>
+
       <div class="item-buttons">
         <button type="button" onclick="adicionarItem(${setorIndex})">+ Adicionar Item</button>
       </div>
@@ -503,6 +512,12 @@
           });
           corpoEmail += `\n`;
       }
+
+      const observacao = setor.querySelector('.observacao').value;
+      if (observacao) {
+        corpoEmail += `Observação: ${observacao}\n\n`;
+      }
+
       corpoEmail += `----------------------------------------\n\n`;
     });
 
