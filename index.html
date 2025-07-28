@@ -144,8 +144,8 @@
       top: 100%;
       left: 0;
       width: 100%;
-      background-color: var(--background-white);
-      border: 1px solid var(--border-light);
+      background-color: rgba(10, 102, 194, 0.1);
+      border: 1px solid var(--primary-color);
       border-radius: 12px;
       box-shadow: var(--shadow-light);
       max-height: 200px;
@@ -165,7 +165,7 @@
     }
 
     .custom-select .options .option:hover {
-      background-color: rgba(255, 255, 255, 0.1);
+      background-color: rgba(10, 102, 194, 0.2);
     }
 
     .custom-select .options .option.selected {
@@ -355,23 +355,7 @@
         align-self: flex-start; /* Ou center, se preferir */
       }
     }
-  
-    .caixa-selecao {
-      margin-top: 20px;
-      padding: 30px;
-      border: 1px solid var(--border-light);
-      border-radius: 16px;
-      background-color: rgba(0, 0, 0, 0.2);
-      box-shadow: var(--shadow-light);
-      transition: var(--transition-all);
-      animation: fadeIn 0.5s ease-in-out;
-    }
-    .caixa-selecao:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
-    }
-
-</style>
+  </style>
 </head>
 <body oncontextmenu="return false;">
 
@@ -1731,22 +1715,6 @@ const Epi_ConsumoItems = [
 .observacao::placeholder {
     color: #aaa; /* Cor do placeholder mais clara para contraste */
 }
-
-    .caixa-selecao {
-      margin-top: 20px;
-      padding: 30px;
-      border: 1px solid var(--border-light);
-      border-radius: 16px;
-      background-color: rgba(0, 0, 0, 0.2);
-      box-shadow: var(--shadow-light);
-      transition: var(--transition-all);
-      animation: fadeIn 0.5s ease-in-out;
-    }
-    .caixa-selecao:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
-    }
-
 </style>
 
     `;
