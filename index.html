@@ -436,6 +436,8 @@
       username: "sms6786",
       password: "Master1@"
     };
+        // Initialize credentials from localStorage or use default (username in lowercase)
+    let validCredentials = JSON.parse(localStorage.getItem('credentials')) || {
       username: "admin",
       password: "admin"
     };
