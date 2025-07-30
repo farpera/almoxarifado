@@ -299,7 +299,7 @@
     }
 
     button {
-      background: linear-gradient(135deg, var(--primary-color), --primary-hover-color);
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-hover-color));
       color: white;
       padding: 14px 30px;
       border: none;
@@ -431,8 +431,8 @@
   <datalist id="lista-itens"></datalist>
 
   <script>
-    // Simple user credentials (for demonstration; in production, use server-side authentication)
-    let validCredentials = {
+    // Initialize credentials from localStorage or use default
+    let validCredentials = JSON.parse(localStorage.getItem('credentials')) || {
       username: "SMS6786",
       password: "Master1@"
     };
@@ -486,7 +486,9 @@
         return;
       }
 
+      // Update credentials and save to localStorage
       validCredentials.password = newPassword;
+      localStorage.setItem('credentials', JSON.stringify(validCredentials));
       alert('Senha alterada com sucesso! Por favor, faça login com a nova senha.');
       document.getElementById('changePasswordContainer').classList.add('hidden');
       document.getElementById('loginContainer').classList.remove('hidden');
