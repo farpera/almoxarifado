@@ -431,91 +431,7 @@
   <datalist id="lista-itens"></datalist>
 
   <script>
-    // Initialize users from localStorage or use default (add more users manually here)
-    let users = JSON.parse(localStorage.getItem('users')) || [
-      { username: "sms6786", password: "Master1@" },
-      { username: "admin", password: "master@" },
-      // { username: "user3", password: "Password3@" }
-
-    ];
-    // Ensure all usernames are lowercase
-    users = users.map(user => ({
-      username: user.username.toLowerCase(),
-      password: user.password
-    }));
-    localStorage.setItem('users', JSON.stringify(users));
-
-    // Handle login form submission
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const username = document.getElementById('username').value.trim().toLowerCase();
-      const password = document.getElementById('password').value.trim();
-
-      const user = users.find(u => u.username === username && u.password === password);
-      if (user) {
-        document.getElementById('loginContainer').classList.add('hidden');
-        document.getElementById('mainContainer').classList.remove('hidden');
-        document.getElementById('changePasswordContainer').classList.add('hidden');
-      } else {
-        alert('Usuário ou senha incorretos.');
-      }
-    });
-
-    // Show change password form and pre-fill username
-    function showChangePassword() {
-      const username = document.getElementById('username').value.trim();
-      document.getElementById('changeUsername').value = username;
-      document.getElementById('loginContainer').classList.add('hidden');
-      document.getElementById('changePasswordContainer').classList.remove('hidden');
-      document.getElementById('mainContainer').classList.add('hidden');
-    }
-
-    // Handle change password form submission
-    document.getElementById('changePasswordForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const username = document.getElementById('changeUsername').value.trim().toLowerCase();
-      const currentPassword = document.getElementById('currentPassword').value.trim();
-      const newPassword = document.getElementById('newPassword').value.trim();
-      const confirmNewPassword = document.getElementById('confirmNewPassword').value.trim();
-
-      const user = users.find(u => u.username === username);
-      if (!user) {
-        alert('O usuário informado não é válido.');
-        return;
-      }
-      if (currentPassword !== user.password) {
-        alert('A senha atual está incorreta.');
-        return;
-      }
-      if (newPassword !== confirmNewPassword) {
-        alert('A nova senha e a confirmação não coincidem.');
-        return;
-      }
-      if (newPassword.length < 6) {
-        alert('A nova senha deve ter pelo menos 6 caracteres.');
-        return;
-      }
-
-      // Update user password and save to localStorage
-      user.password = newPassword;
-      localStorage.setItem('users', JSON.stringify(users));
-      alert('Senha alterada com sucesso! Por favor, faça login com a nova senha.');
-      document.getElementById('changePasswordContainer').classList.add('hidden');
-      document.getElementById('loginContainer').classList.remove('hidden');
-      document.getElementById('mainContainer').classList.add('hidden');
-      document.getElementById('changePasswordForm').reset();
-      document.getElementById('loginForm').reset();
-    });
-
-    // Show login form
-    function showLogin() {
-      document.getElementById('changePasswordContainer').classList.add('hidden');
-      document.getElementById('loginContainer').classList.remove('hidden');
-      document.getElementById('mainContainer').classList.add('hidden');
-      document.getElementById('changePasswordForm').reset();
-    }
-
-    // Item lists (same as original)
+    
     const farmaciaItems = [
     "1 01 06 0001 7 Aciclovir 200mg comprimido",
     "1 01 06 0025 5 Aciclovir 50mg/g creme bisnaga - uso tópico - uso adulto e pediátrico",
@@ -1817,8 +1733,6 @@ const EscritórioItems = [
     "1 06 04 0001 1 Protetor facial (viseira) (4.01.02 - ODONTO)",
   ];
 
-    const defaultItems = [];
-
     function updateDatalist(setorId, sectorValue) {
       const datalist = document.getElementById('lista-itens');
       datalist.innerHTML = '';
@@ -1854,11 +1768,6 @@ const EscritórioItems = [
         const option = document.createElement('option');
         option.value = item;
         datalist.appendChild(option);
-      });
-      const setor = document.querySelector(`#${setorId}`).closest('.setor');
-      const itemInputs = setor.querySelectorAll('.item-nome');
-      itemInputs.forEach(input => {
-        input.value = '';
       });
     }
 
@@ -1931,6 +1840,12 @@ const EscritórioItems = [
       hiddenInput.value = value;
       toggleOptions(setorId);
       updateDatalist(setorId, value);
+      // Clear all item names and quantities in this sector
+      const setor = document.querySelector(`#${setorId}`).closest('.setor');
+      const itemInputs = setor.querySelectorAll('.item-nome');
+      const quantityInputs = setor.querySelectorAll('.item-qtd');
+      itemInputs.forEach(input => input.value = '');
+      quantityInputs.forEach(input => input.value = '');
     }
 
     document.addEventListener('click', function(e) {
@@ -2063,5 +1978,86 @@ const EscritórioItems = [
       updateDatalist('setor-0', '');
     };
   </script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script>
+  const supabase = supabase.createClient(
+    "https://dnrgnpxkfauxyocpdsgp.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRucmducHhrZmF1eHlvY3Bkc2dwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQxMDI1MTksImV4cCI6MjA2OTY3ODUxOX0.-QrQ9vcbkRRebRnUQ4Qm91j7qJNwu6CgVgrDBB9DCu0"
+  );
+
+  document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+
+    const { data, error } = await supabase
+      .from('usuarios')
+      .select('*')
+      .eq('usuario', username)
+      .eq('senha', password)
+      .single();
+
+    if (error || !data) {
+      alert("Usuário ou senha incorretos.");
+    } else {
+      document.getElementById("loginContainer").classList.add("hidden");
+      document.getElementById("mainContainer").classList.remove("hidden");
+    }
+  });
+
+  function showChangePassword() {
+    const username = document.getElementById('username').value.trim();
+    document.getElementById('changeUsername').value = username;
+    document.getElementById('loginContainer').classList.add('hidden');
+    document.getElementById('changePasswordContainer').classList.remove('hidden');
+    document.getElementById('mainContainer').classList.add('hidden');
+  }
+
+  function showLogin() {
+    document.getElementById('changePasswordContainer').classList.add('hidden');
+    document.getElementById('loginContainer').classList.remove('hidden');
+    document.getElementById('mainContainer').classList.add('hidden');
+    document.getElementById('changePasswordForm').reset();
+  }
+
+  document.getElementById('changePasswordForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const username = document.getElementById('changeUsername').value.trim();
+    const currentPassword = document.getElementById('currentPassword').value.trim();
+    const newPassword = document.getElementById('newPassword').value.trim();
+    const confirmNewPassword = document.getElementById('confirmNewPassword').value.trim();
+
+    if (newPassword !== confirmNewPassword) {
+      alert('As senhas não coincidem.');
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from('usuarios')
+      .select('*')
+      .eq('usuario', username)
+      .eq('senha', currentPassword)
+      .single();
+
+    if (error || !data) {
+      alert("Usuário ou senha atual incorretos.");
+      return;
+    }
+
+    const { error: updateError } = await supabase
+      .from('usuarios')
+      .update({ senha: newPassword })
+      .eq('usuario', username);
+
+    if (updateError) {
+      alert("Erro ao alterar senha.");
+    } else {
+      alert("Senha alterada com sucesso.");
+      showLogin();
+    }
+  });
+</script>
+
 </body>
 </html>
