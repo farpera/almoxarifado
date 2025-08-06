@@ -188,21 +188,26 @@
         }
 
         // Initializing Google API Client
-        function initGoogleSheets() {
+        let googleInitialized = false;
+function initGoogleSheets() {
             gapi.load('client:auth2', () => {
                 gapi.client.init({
-                    apiKey: 'YOUR_API_KEY', // Replace with your Google API key
-                    clientId: 'YOUR_CLIENT_ID', // Replace with your Google Client ID
+                    apiKey: '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', // Replace with your Google API key
+                    clientId: '932159734645-tm1ris8v71anr72ctlocp8keorsv4sn7.apps.googleusercontent.com', // Replace with your Google Client ID
                     scope: 'https://www.googleapis.com/auth/spreadsheets',
                     discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4']
                 }).then(() => {
-                    console.log('Google API initialized');
+                    return gapi.auth2.getAuthInstance().signIn();
                 }).catch(err => console.error('Error initializing Google API:', err));
             });
         }
 
         // Submitting order to Google Sheets
         async function submitOrder(tab) {
+    if (!googleInitialized) {
+        alert("Aguarde... a API do Google ainda está carregando ou você não fez login.");
+        return;
+    }
             const responsible = document.getElementById('responsible').value;
             const period = document.getElementById('period').value;
             const rows = document.querySelectorAll(`#${tab}TableBody tr`);
@@ -228,7 +233,7 @@
                 document.getElementById('status').classList.add('hidden');
 
                 await gapi.client.sheets.spreadsheets.values.append({
-                    spreadsheetId: 'YOUR_SPREADSHEET_ID', // Replace with your Google Sheet ID
+                    spreadsheetId: '1yYIEDac79pRybNC8bHHzAXAuE8HkGN3Ks8no3XWyzIY', // Replace with your Google Sheet ID
                     range: `${tab.charAt(0).toUpperCase() + tab.slice(1)}!A1`, // e.g., Farmácia!A1, Odonto!A1
                     valueInputOption: 'RAW',
                     insertDataOption: 'INSERT_ROWS',
