@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monthly Order Request System</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Monthly Order Request System - USF Santa Maria</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://apis.google.com/js/api.js"></script>
 </head>
-<body class="bg-gray-100 font-sans">
+<body class="bg-blue-50 font-sans">
     <div class="container mx-auto p-4">
         <!-- Header Section -->
         <h1 class="text-3xl font-bold text-center mb-6">Monthly Order Request - USF Santa Maria</h1>
@@ -18,33 +18,55 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Responsible Person</label>
-                    <input id="responsible" type="text" value="Fabiano Oliveira Soares Leitão" class="mt-1 block w-full p-2 border rounded-md">
+                    <input id="responsible" type="text" value="Fabiano Oliveira Soares Leitão" class="mt-1 block w-full p-2 border rounded-md" />
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Period</label>
-                    <input id="period" type="text" value="30/05/2025 to 01/08/2025" class="mt-1 block w-full p-2 border rounded-md">
+                    <input id="period" type="text" value="" class="mt-1 block w-full p-2 border rounded-md" />
                 </div>
             </div>
         </div>
 
         <!-- Tabs Navigation -->
-        <div class="mb-4">
-            <ul class="flex border-b">
+        <div class="mb-4 overflow-auto">
+            <ul class="flex border-b whitespace-nowrap min-w-max">
                 <li class="mr-1">
                     <button class="tab-button bg-white px-4 py-2 font-semibold text-gray-700 border-t border-l border-r rounded-t" data-tab="farmacia">Farmácia</button>
+                </li>
+                <li class="mr-1">
+                    <button class="tab-button bg-gray-200 px-4 py-2 font-semibold text-gray-700" data-tab="psicotropicos">Psicotrópicos</button>
+                </li>
+                <li class="mr-1">
+                    <button class="tab-button bg-gray-200 px-4 py-2 font-semibold text-gray-700" data-tab="enfermagem">Enfermagem</button>
+                </li>
+                <li class="mr-1">
+                    <button class="tab-button bg-gray-200 px-4 py-2 font-semibold text-gray-700" data-tab="enfermagemDST">Enfermagem DST</button>
+                </li>
+                <li class="mr-1">
+                    <button class="tab-button bg-gray-200 px-4 py-2 font-semibold text-gray-700" data-tab="enfermagemUrgenciaEmergencia">Enfermagem Urgência e Emergência</button>
                 </li>
                 <li class="mr-1">
                     <button class="tab-button bg-gray-200 px-4 py-2 font-semibold text-gray-700" data-tab="odonto">Odonto</button>
                 </li>
                 <li class="mr-1">
-                    <button class="tab-button bg-gray-200 px-4 py-2 font-semibold text-gray-700" data-tab="enfermagem">Enfermagem</button>
+                    <button class="tab-button bg-gray-200 px-4 py-2 font-semibold text-gray-700" data-tab="odontoInstrumental">Odonto Instrumental</button>
+                </li>
+                <li class="mr-1">
+                    <button class="tab-button bg-gray-200 px-4 py-2 font-semibold text-gray-700" data-tab="consumoLimpezaPeriodico">Consumo e Limpeza Periódico</button>
+                </li>
+                <li class="mr-1">
+                    <button class="tab-button bg-gray-200 px-4 py-2 font-semibold text-gray-700" data-tab="consumoLimpezaEsporadico">Consumo e Limpeza Esporádico</button>
+                </li>
+                <li class="mr-1">
+                    <button class="tab-button bg-gray-200 px-4 py-2 font-semibold text-gray-700" data-tab="impressosMateriaisEscritorio">Impressos e Materiais de Escritório</button>
                 </li>
             </ul>
         </div>
 
         <!-- Tab Content -->
         <div id="tab-content">
-            <!-- Farmácia Tab -->
+
+            <!-- Farmácia -->
             <div id="farmacia" class="tab-pane bg-white p-6 rounded-lg shadow-md">
                 <h2 class="text-xl font-semibold mb-4">Farmácia Order Items</h2>
                 <div class="overflow-x-auto">
@@ -62,14 +84,14 @@
                         <tbody id="farmaciaTableBody"></tbody>
                     </table>
                 </div>
-                <button class="submitOrder mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600" data-tab="farmacia">Submit Farmácia Order</button>
+                <button class="submitOrder mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700" data-tab="farmacia">Submit Farmácia Order</button>
             </div>
 
-            <!-- Odonto Tab -->
-            <div id="odonto" class="tab-pane hidden bg-white p-6 rounded-lg shadow-md">
-                <h2 class="text-xl font-semibold mb-4">Odonto Order Items</h2>
+            <!-- Psicotrópicos -->
+            <div id="psicotropicos" class="tab-pane hidden bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">Psicotrópicos Order Items</h2>
                 <div class="overflow-x-auto">
-                    <table id="odontoTable" class="min-w-full table-auto">
+                    <table id="psicotropicosTable" class="min-w-full table-auto">
                         <thead>
                             <tr class="bg-gray-200">
                                 <th class="px-4 py-2 text-left">Código SMAR</th>
@@ -80,13 +102,13 @@
                                 <th class="px-4 py-2 text-left">Sugestão de Pedido</th>
                             </tr>
                         </thead>
-                        <tbody id="odontoTableBody"></tbody>
+                        <tbody id="psicotropicosTableBody"></tbody>
                     </table>
                 </div>
-                <button class="submitOrder mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600" data-tab="odonto">Submit Odonto Order</button>
+                <button class="submitOrder mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700" data-tab="psicotropicos">Submit Psicotrópicos Order</button>
             </div>
 
-            <!-- Enfermagem Tab -->
+            <!-- Enfermagem -->
             <div id="enfermagem" class="tab-pane hidden bg-white p-6 rounded-lg shadow-md">
                 <h2 class="text-xl font-semibold mb-4">Enfermagem Order Items</h2>
                 <div class="overflow-x-auto">
@@ -104,18 +126,164 @@
                         <tbody id="enfermagemTableBody"></tbody>
                     </table>
                 </div>
-                <button class="submitOrder mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600" data-tab="enfermagem">Submit Enfermagem Order</button>
+                <button class="submitOrder mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700" data-tab="enfermagem">Submit Enfermagem Order</button>
             </div>
+
+            <!-- Enfermagem DST -->
+            <div id="enfermagemDST" class="tab-pane hidden bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">Enfermagem DST Order Items</h2>
+                <div class="overflow-x-auto">
+                    <table id="enfermagemDSTTable" class="min-w-full table-auto">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="px-4 py-2 text-left">Código SMAR</th>
+                                <th class="px-4 py-2 text-left">Descrição completa</th>
+                                <th class="px-4 py-2 text-left">Unidade de Medida</th>
+                                <th class="px-4 py-2 text-left">Saldo Vivver</th>
+                                <th class="px-4 py-2 text-left">Consumo Médio</th>
+                                <th class="px-4 py-2 text-left">Sugestão de Pedido</th>
+                            </tr>
+                        </thead>
+                        <tbody id="enfermagemDSTTableBody"></tbody>
+                    </table>
+                </div>
+                <button class="submitOrder mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700" data-tab="enfermagemDST">Submit Enfermagem DST Order</button>
+            </div>
+
+            <!-- Enfermagem Urgência e Emergência -->
+            <div id="enfermagemUrgenciaEmergencia" class="tab-pane hidden bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">Enfermagem Urgência e Emergência Order Items</h2>
+                <div class="overflow-x-auto">
+                    <table id="enfermagemUrgenciaEmergenciaTable" class="min-w-full table-auto">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="px-4 py-2 text-left">Código SMAR</th>
+                                <th class="px-4 py-2 text-left">Descrição completa</th>
+                                <th class="px-4 py-2 text-left">Unidade de Medida</th>
+                                <th class="px-4 py-2 text-left">Saldo Vivver</th>
+                                <th class="px-4 py-2 text-left">Consumo Médio</th>
+                                <th class="px-4 py-2 text-left">Sugestão de Pedido</th>
+                            </tr>
+                        </thead>
+                        <tbody id="enfermagemUrgenciaEmergenciaTableBody"></tbody>
+                    </table>
+                </div>
+                <button class="submitOrder mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700" data-tab="enfermagemUrgenciaEmergencia">Submit Enfermagem Urgência e Emergência Order</button>
+            </div>
+
+            <!-- Odonto -->
+            <div id="odonto" class="tab-pane hidden bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">Odonto Order Items</h2>
+                <div class="overflow-x-auto">
+                    <table id="odontoTable" class="min-w-full table-auto">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="px-4 py-2 text-left">Código SMAR</th>
+                                <th class="px-4 py-2 text-left">Descrição completa</th>
+                                <th class="px-4 py-2 text-left">Unidade de Medida</th>
+                                <th class="px-4 py-2 text-left">Saldo Vivver</th>
+                                <th class="px-4 py-2 text-left">Consumo Médio</th>
+                                <th class="px-4 py-2 text-left">Sugestão de Pedido</th>
+                            </tr>
+                        </thead>
+                        <tbody id="odontoTableBody"></tbody>
+                    </table>
+                </div>
+                <button class="submitOrder mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700" data-tab="odonto">Submit Odonto Order</button>
+            </div>
+
+            <!-- Odonto Instrumental -->
+            <div id="odontoInstrumental" class="tab-pane hidden bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">Odonto Instrumental Order Items</h2>
+                <div class="overflow-x-auto">
+                    <table id="odontoInstrumentalTable" class="min-w-full table-auto">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="px-4 py-2 text-left">Código SMAR</th>
+                                <th class="px-4 py-2 text-left">Descrição completa</th>
+                                <th class="px-4 py-2 text-left">Unidade de Medida</th>
+                                <th class="px-4 py-2 text-left">Saldo Vivver</th>
+                                <th class="px-4 py-2 text-left">Consumo Médio</th>
+                                <th class="px-4 py-2 text-left">Sugestão de Pedido</th>
+                            </tr>
+                        </thead>
+                        <tbody id="odontoInstrumentalTableBody"></tbody>
+                    </table>
+                </div>
+                <button class="submitOrder mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700" data-tab="odontoInstrumental">Submit Odonto Instrumental Order</button>
+            </div>
+
+            <!-- Consumo e Limpeza Periódico -->
+            <div id="consumoLimpezaPeriodico" class="tab-pane hidden bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">Consumo e Limpeza Periódico Order Items</h2>
+                <div class="overflow-x-auto">
+                    <table id="consumoLimpezaPeriodicoTable" class="min-w-full table-auto">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="px-4 py-2 text-left">Código SMAR</th>
+                                <th class="px-4 py-2 text-left">Descrição completa</th>
+                                <th class="px-4 py-2 text-left">Unidade de Medida</th>
+                                <th class="px-4 py-2 text-left">Saldo Vivver</th>
+                                <th class="px-4 py-2 text-left">Consumo Médio</th>
+                                <th class="px-4 py-2 text-left">Sugestão de Pedido</th>
+                            </tr>
+                        </thead>
+                        <tbody id="consumoLimpezaPeriodicoTableBody"></tbody>
+                    </table>
+                </div>
+                <button class="submitOrder mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700" data-tab="consumoLimpezaPeriodico">Submit Consumo e Limpeza Periódico Order</button>
+            </div>
+
+            <!-- Consumo e Limpeza Esporádico -->
+            <div id="consumoLimpezaEsporadico" class="tab-pane hidden bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">Consumo e Limpeza Esporádico Order Items</h2>
+                <div class="overflow-x-auto">
+                    <table id="consumoLimpezaEsporadicoTable" class="min-w-full table-auto">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="px-4 py-2 text-left">Código SMAR</th>
+                                <th class="px-4 py-2 text-left">Descrição completa</th>
+                                <th class="px-4 py-2 text-left">Unidade de Medida</th>
+                                <th class="px-4 py-2 text-left">Saldo Vivver</th>
+                                <th class="px-4 py-2 text-left">Consumo Médio</th>
+                                <th class="px-4 py-2 text-left">Sugestão de Pedido</th>
+                            </tr>
+                        </thead>
+                        <tbody id="consumoLimpezaEsporadicoTableBody"></tbody>
+                    </table>
+                </div>
+                <button class="submitOrder mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700" data-tab="consumoLimpezaEsporadico">Submit Consumo e Limpeza Esporádico Order</button>
+            </div>
+
+            <!-- Impressos e Materiais de Escritório -->
+            <div id="impressosMateriaisEscritorio" class="tab-pane hidden bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">Impressos e Materiais de Escritório Order Items</h2>
+                <div class="overflow-x-auto">
+                    <table id="impressosMateriaisEscritorioTable" class="min-w-full table-auto">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="px-4 py-2 text-left">Código SMAR</th>
+                                <th class="px-4 py-2 text-left">Descrição completa</th>
+                                <th class="px-4 py-2 text-left">Unidade de Medida</th>
+                                <th class="px-4 py-2 text-left">Saldo Vivver</th>
+                                <th class="px-4 py-2 text-left">Consumo Médio</th>
+                                <th class="px-4 py-2 text-left">Sugestão de Pedido</th>
+                            </tr>
+                        </thead>
+                        <tbody id="impressosMateriaisEscritorioTableBody"></tbody>
+                    </table>
+                </div>
+                <button class="submitOrder mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700" data-tab="impressosMateriaisEscritorio">Submit Impressos e Materiais de Escritório Order</button>
+            </div>
+
         </div>
 
-        <!-- Loading Message -->
+        <!-- Loading and Status Messages -->
         <div id="loading" class="hidden text-center mt-4 text-gray-600">Loading...</div>
-        <!-- Status Message -->
         <div id="status" class="hidden text-center mt-4"></div>
     </div>
 
     <script>
-        // Sample data from Excel sheets (subset for brevity)
         const data = {
             farmacia: [
                 { codigo: "1 01 06 0001 7", descricao: "Aciclovir 200mg comprimido", unidade: "Comprimido", saldo: 1000, consumo: 770, sugestao: -230 },
@@ -123,98 +291,118 @@
                 { codigo: "1 01 03 0001 3", descricao: "Ácido acetilsalicílico 100mg comprimido", unidade: "Comprimido", saldo: 2000, consumo: 6000, sugestao: 4000 },
                 { codigo: "1 01 09 0001 0", descricao: "Ácido fólico 5mg comprimido", unidade: "Comprimido", saldo: 400, consumo: 1100, sugestao: 700 }
             ],
+            psicotropicos: [],
+            enfermagem: [
+                { codigo: "1 02 12 0001 5", descricao: "Abaixador de lingua de madeira (Pacote c/ 100 unidades)", unidade: "Pacote", saldo: 2, consumo: 2, sugestao: 0 },
+                { codigo: "1 02 03 0001 6", descricao: "Ácido graxo essencial (Age)", unidade: "Frasco", saldo: 6, consumo: 3, sugestao: -3 },
+                { codigo: "1 02 01 0004 1", descricao: "Agulha descartável hipodérmica 25 x 7 mm", unidade: "Unidade", saldo: 200, consumo: 157, sugestao: -43 },
+                { codigo: "1 02 11 0005 3", descricao: "Álcool 70º (Antisséptico e bactericida)", unidade: "Litro", saldo: 8, consumo: 10, sugestao: 2 }
+            ],
+            enfermagemDST: [],
+            enfermagemUrgenciaEmergencia: [],
             odonto: [
                 { codigo: "1 07 01 0001 0", descricao: "Ácido condicionador para resina foto", unidade: "Frasco", saldo: 0, consumo: 1, sugestao: 1 },
                 { codigo: "1 07 01 0002 9", descricao: "Agulha curta para anestesia", unidade: "Caixa", saldo: 0, consumo: 0, sugestao: 0 },
                 { codigo: "1 07 01 0086 0", descricao: "Máscara cirúrgica descartável", unidade: "Unidade", saldo: 0, consumo: 100, sugestao: 100 },
                 { codigo: "1 07 01 0093 2", descricao: "Óxido zinco pó", unidade: "Unidade", saldo: 0, consumo: 1, sugestao: 1 }
             ],
-            enfermagem: [
-                { codigo: "1 02 12 0001 5", descricao: "Abaixador de lingua de madeira (Pacote c/ 100 unidades)", unidade: "Pacote", saldo: 2, consumo: 2, sugestao: 0 },
-                { codigo: "1 02 03 0001 6", descricao: "Ácido graxo essencial (Age)", unidade: "Frasco", saldo: 6, consumo: 3, sugestao: -3 },
-                { codigo: "1 02 01 0004 1", descricao: "Agulha descartável hipodérmica 25 x 7 mm", unidade: "Unidade", saldo: 200, consumo: 157, sugestao: -43 },
-                { codigo: "1 02 11 0005 3", descricao: "Álcool 70º (Antisséptico e bactericida)", unidade: "Litro", saldo: 8, consumo: 10, sugestao: 2 }
-            ]
+            odontoInstrumental: [],
+            consumoLimpezaPeriodico: [],
+            consumoLimpezaEsporadico: [],
+            impressosMateriaisEscritorio: []
         };
 
-        // Rendering table for a specific tab
         function renderTable(tab, items) {
             const tableBody = document.getElementById(`${tab}TableBody`);
+            if (!tableBody) return;
+
             tableBody.innerHTML = '';
             items.forEach(item => {
+                let colorClass = '';
+                if (item.sugestao < 0) colorClass = 'bg-red-100 text-red-700 font-bold';
+                else if (item.sugestao > 0) colorClass = 'bg-green-100 text-green-700 font-bold';
+
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td class="border px-4 py-2">${item.codigo}</td>
+                    <td class="border px-4 py-2" data-codigo="${item.codigo}">${item.codigo}</td>
                     <td class="border px-4 py-2">${item.descricao}</td>
                     <td class="border px-4 py-2">${item.unidade}</td>
                     <td class="border px-4 py-2">
-                        <input type="number" value="${item.saldo}" class="w-full p-1 border rounded" data-codigo="${item.codigo}" data-field="saldo">
+                        <input type="number" value="${item.saldo}" class="w-full p-1 border rounded" data-codigo="${item.codigo}" data-field="saldo" />
                     </td>
                     <td class="border px-4 py-2">
-                        <input type="number" value="${item.consumo}" class="w-full p-1 border rounded" data-codigo="${item.codigo}" data-field="consumo">
+                        <input type="number" value="${item.consumo}" class="w-full p-1 border rounded" data-codigo="${item.codigo}" data-field="consumo" />
                     </td>
                     <td class="border px-4 py-2">
-                        <input type="number" value="${item.sugestao}" class="w-full p-1 border rounded" data-codigo="${item.codigo}" data-field="sugestao" readonly>
+                        <input type="number" value="${item.sugestao}" class="w-full p-1 border rounded ${colorClass}" data-codigo="${item.codigo}" data-field="sugestao" readonly />
                     </td>
                 `;
                 tableBody.appendChild(row);
             });
 
-            // Adding event listeners for dynamic calculation
             document.querySelectorAll(`#${tab}TableBody input[data-field="saldo"], #${tab}TableBody input[data-field="consumo"]`).forEach(input => {
                 input.addEventListener('input', () => {
-                    const codigo = input.dataset.codigo;
                     const row = input.closest('tr');
                     const saldoInput = row.querySelector('input[data-field="saldo"]');
                     const consumoInput = row.querySelector('input[data-field="consumo"]');
                     const sugestaoInput = row.querySelector('input[data-field="sugestao"]');
                     const saldo = parseInt(saldoInput.value) || 0;
                     const consumo = parseInt(consumoInput.value) || 0;
-                    sugestaoInput.value = consumo - saldo; // Calculate Sugestão de Pedido
+                    const sugestao = consumo - saldo;
+                    sugestaoInput.value = sugestao;
+
+                    sugestaoInput.classList.remove('bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700', 'font-bold');
+
+                    if (sugestao < 0) {
+                        sugestaoInput.classList.add('bg-red-100', 'text-red-700', 'font-bold');
+                    } else if (sugestao > 0) {
+                        sugestaoInput.classList.add('bg-green-100', 'text-green-700', 'font-bold');
+                    }
                 });
             });
         }
 
-        // Tab switching logic
         function switchTab(tabName) {
             document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.add('hidden'));
             document.querySelectorAll('.tab-button').forEach(button => {
                 button.classList.remove('bg-white', 'border-t', 'border-l', 'border-r', 'rounded-t');
                 button.classList.add('bg-gray-200');
             });
-            document.getElementById(tabName).classList.remove('hidden');
-            document.querySelector(`button[data-tab="${tabName}"]`).classList.add('bg-white', 'border-t', 'border-l', 'border-r', 'rounded-t');
-            document.querySelector(`button[data-tab="${tabName}"]`).classList.remove('bg-gray-200');
+            const tabContent = document.getElementById(tabName);
+            if (tabContent) tabContent.classList.remove('hidden');
+            const activeButton = document.querySelector(`button[data-tab="${tabName}"]`);
+            if (activeButton) {
+                activeButton.classList.add('bg-white', 'border-t', 'border-l', 'border-r', 'rounded-t');
+                activeButton.classList.remove('bg-gray-200');
+            }
         }
 
-        // Initializing Google API Client
-        let googleInitialized = false;
-function initGoogleSheets() {
+        function initGoogleSheets() {
             gapi.load('client:auth2', () => {
                 gapi.client.init({
-                    apiKey: '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', // Replace with your Google API key
-                    clientId: '932159734645-tm1ris8v71anr72ctlocp8keorsv4sn7.apps.googleusercontent.com', // Replace with your Google Client ID
+                    apiKey: 'YOUR_API_KEY', // substitua aqui
+                    clientId: 'YOUR_CLIENT_ID', // substitua aqui
                     scope: 'https://www.googleapis.com/auth/spreadsheets',
                     discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4']
                 }).then(() => {
-                    return gapi.auth2.getAuthInstance().signIn();
+                    console.log('Google API initialized');
                 }).catch(err => console.error('Error initializing Google API:', err));
             });
         }
 
-        // Submitting order to Google Sheets
         async function submitOrder(tab) {
-    if (!googleInitialized) {
-        alert("Aguarde... a API do Google ainda está carregando ou você não fez login.");
-        return;
-    }
             const responsible = document.getElementById('responsible').value;
             const period = document.getElementById('period').value;
             const rows = document.querySelectorAll(`#${tab}TableBody tr`);
+            if (!rows.length) {
+                alert(`Tabela do pedido ${tab} está vazia!`);
+                return;
+            }
+
             const orderData = Array.from(rows).map(row => {
                 const inputs = row.querySelectorAll('input');
                 return {
-                    codigo: inputs[0].dataset.codigo,
+                    codigo: inputs[0].dataset.codigo || row.cells[0].textContent,
                     saldo: parseInt(inputs[0].value) || 0,
                     consumo: parseInt(inputs[1].value) || 0,
                     sugestao: parseInt(inputs[2].value) || 0
@@ -233,8 +421,8 @@ function initGoogleSheets() {
                 document.getElementById('status').classList.add('hidden');
 
                 await gapi.client.sheets.spreadsheets.values.append({
-                    spreadsheetId: '1yYIEDac79pRybNC8bHHzAXAuE8HkGN3Ks8no3XWyzIY', // Replace with your Google Sheet ID
-                    range: `${tab.charAt(0).toUpperCase() + tab.slice(1)}!A1`, // e.g., Farmácia!A1, Odonto!A1
+                    spreadsheetId: 'YOUR_SPREADSHEET_ID', // substitua aqui
+                    range: `${capitalizeFirstLetter(tab)}!A1`,
                     valueInputOption: 'RAW',
                     insertDataOption: 'INSERT_ROWS',
                     resource: { values }
@@ -242,30 +430,34 @@ function initGoogleSheets() {
 
                 document.getElementById('loading').classList.add('hidden');
                 document.getElementById('status').classList.remove('hidden');
-                document.getElementById('status').innerText = `Order for ${tab} submitted successfully!`;
+                document.getElementById('status').innerText = `Pedido para ${tab} enviado com sucesso!`;
+                document.getElementById('status').classList.remove('text-red-600');
                 document.getElementById('status').classList.add('text-green-600');
             } catch (err) {
                 document.getElementById('loading').classList.add('hidden');
                 document.getElementById('status').classList.remove('hidden');
-                document.getElementById('status').innerText = `Error submitting order for ${tab}: ${err.message}`;
+                document.getElementById('status').innerText = `Erro ao enviar pedido para ${tab}: ${err.message}`;
+                document.getElementById('status').classList.remove('text-green-600');
                 document.getElementById('status').classList.add('text-red-600');
-                console.error(`Error submitting to Google Sheets for ${tab}:`, err);
+                console.error(`Erro ao enviar para Google Sheets para ${tab}:`, err);
             }
         }
 
-        // Initializing page
-        document.addEventListener('DOMContentLoaded', () => {
-            // Render tables for each tab
-            renderTable('farmacia', data.farmacia);
-            renderTable('odonto', data.odonto);
-            renderTable('enfermagem', data.enfermagem);
+        function capitalizeFirstLetter(string) {
+            if (!string) return string;
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
 
-            // Initialize tab switching
+        document.addEventListener('DOMContentLoaded', () => {
+            // Render all tabs data
+            Object.entries(data).forEach(([tabKey, items]) => renderTable(tabKey, items));
+
+            // Setup tab switching
             document.querySelectorAll('.tab-button').forEach(button => {
                 button.addEventListener('click', () => switchTab(button.dataset.tab));
             });
 
-            // Initialize submit buttons
+            // Setup submit buttons
             document.querySelectorAll('.submitOrder').forEach(button => {
                 button.addEventListener('click', () => submitOrder(button.dataset.tab));
             });
@@ -273,7 +465,7 @@ function initGoogleSheets() {
             // Initialize Google Sheets API
             initGoogleSheets();
 
-            // Show Farmácia tab by default
+            // Show default tab
             switchTab('farmacia');
         });
     </script>
