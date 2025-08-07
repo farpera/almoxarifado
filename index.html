@@ -286,186 +286,185 @@
         <div id="status" class="hidden text-center mt-4"></div>
     </div>
 
-    <script>
-        // Dados iniciais
-        const data = {
-            farmacia: [
-                { codigo: "1 01 06 0001 7", descricao: "Aciclovir 200mg comprimido", unidade: "Comprimido", saldo: 1000, consumo: 770, sugestao: -230 },
-                { codigo: "1 01 06 002 5", descricao: "Aciclovir 50mg/g creme bisnaga", unidade: "Bisnaga", saldo: 15, consumo: 15, sugestao: 0 },
-                { codigo: "1 01 03 0001 3", descricao: "Ácido acetilsalicílico 100mg comprimido", unidade: "Comprimido", saldo: 2000, consumo: 6000, sugestao: 4000 },
-                { codigo: "1 01 09 0001 0", descricao: "Ácido fólico 5mg comprimido", unidade: "Comprimido", saldo: 400, consumo: 1100, sugestao: 700 }
-            ],
-            psicotropicos: [],
-            enfermagem: [
-                { codigo: "1 02 12 0001 5", descricao: "Abaixador de lingua de madeira (Pacote c/ 100 unidades)", unidade: "Pacote", saldo: 2, consumo: 2, sugestao: 0 },
-                { codigo: "1 02 03 0001 6", descricao: "Ácido graxo essencial (Age)", unidade: "Frasco", saldo: 6, consumo: 3, sugestao: -3 },
-                { codigo: "1 02 01 0004 1", descricao: "Agulha descartável hipodérmica 25 x 7 mm", unidade: "Unidade", saldo: 200, consumo: 157, sugestao: -43 },
-                { codigo: "1 02 11 0005 3", descricao: "Álcool 70º (Antisséptico e bactericida)", unidade: "Litro", saldo: 8, consumo: 10, sugestao: 2 }
-            ],
-            enfermagemDST: [],
-            enfermagemUrgenciaEmergencia: [],
-            odonto: [
-                { codigo: "1 07 01 0001 0", descricao: "Ácido condicionador para resina foto", unidade: "Frasco", saldo: 0, consumo: 1, sugestao: 1 },
-                { codigo: "1 07 01 0002 9", descricao: "Agulha curta para anestesia", unidade: "Caixa", saldo: 0, consumo: 0, sugestao: 0 },
-                { codigo: "1 07 01 0086 0", descricao: "Máscara cirúrgica descartável", unidade: "Unidade", saldo: 0, consumo: 100, sugestao: 100 },
-                { codigo: "1 07 01 0093 2", descricao: "Óxido zinco pó", unidade: "Unidade", saldo: 0, consumo: 1, sugestao: 1 }
-            ],
-            odontoInstrumental: [],
-            consumoLimpezaPeriodico: [],
-            consumoLimpezaEsporadico: [],
-            impressosMateriaisEscritorio: []
-        };
+<script>
+    // Dados iniciais
+    const data = {
+      farmacia: [
+        { codigo: "1 01 06 0001 7", descricao: "Aciclovir 200mg comprimido", unidade: "Comprimido", saldo: 1000, consumo: 770, sugestao: -230 },
+        { codigo: "1 01 06 002 5", descricao: "Aciclovir 50mg/g creme bisnaga", unidade: "Bisnaga", saldo: 15, consumo: 15, sugestao: 0 },
+        { codigo: "1 01 03 0001 3", descricao: "Ácido acetilsalicílico 100mg comprimido", unidade: "Comprimido", saldo: 2000, consumo: 6000, sugestao: 4000 },
+        { codigo: "1 01 09 0001 0", descricao: "Ácido fólico 5mg comprimido", unidade: "Comprimido", saldo: 400, consumo: 1100, sugestao: 700 }
+      ],
+      psicotropicos: [],
+      enfermagem: [
+        { codigo: "1 02 12 0001 5", descricao: "Abaixador de lingua de madeira (Pacote c/ 100 unidades)", unidade: "Pacote", saldo: 2, consumo: 2, sugestao: 0 },
+        { codigo: "1 02 03 0001 6", descricao: "Ácido graxo essencial (Age)", unidade: "Frasco", saldo: 6, consumo: 3, sugestao: -3 },
+        { codigo: "1 02 01 0004 1", descricao: "Agulha descartável hipodérmica 25 x 7 mm", unidade: "Unidade", saldo: 200, consumo: 157, sugestao: -43 },
+        { codigo: "1 02 11 0005 3", descricao: "Álcool 70º (Antisséptico e bactericida)", unidade: "Litro", saldo: 8, consumo: 10, sugestao: 2 }
+      ],
+      enfermagemDST: [],
+      enfermagemUrgenciaEmergencia: [],
+      odonto: [
+        { codigo: "1 07 01 0001 0", descricao: "Ácido condicionador para resina foto", unidade: "Frasco", saldo: 0, consumo: 1, sugestao: 1 },
+        { codigo: "1 07 01 0002 9", descricao: "Agulha curta para anestesia", unidade: "Caixa", saldo: 0, consumo: 0, sugestao: 0 },
+        { codigo: "1 07 01 0086 0", descricao: "Máscara cirúrgica descartável", unidade: "Unidade", saldo: 0, consumo: 100, sugestao: 100 },
+        { codigo: "1 07 01 0093 2", descricao: "Óxido zinco pó", unidade: "Unidade", saldo: 0, consumo: 1, sugestao: 1 }
+      ],
+      odontoInstrumental: [],
+      consumoLimpezaPeriodico: [],
+      consumoLimpezaEsporadico: [],
+      impressosMateriaisEscritorio: []
+    };
 
-        function renderTable(tab, items) {
-            const tableBody = document.getElementById(`${tab}TableBody`);
-            if (!tableBody) return;
+    function renderTable(tab, items) {
+      const tableBody = document.getElementById(`${tab}TableBody`);
+      if (!tableBody) return;
 
-            tableBody.innerHTML = '';
-            items.forEach(item => {
-                let colorClass = '';
-                if (item.sugestao < 0) colorClass = 'bg-red-100 text-red-700 font-bold';
-                else if (item.sugestao > 0) colorClass = 'bg-green-100 text-green-700 font-bold';
+      tableBody.innerHTML = '';
+      items.forEach(item => {
+        let colorClass = '';
+        if (item.sugestao < 0) colorClass = 'bg-red-100 text-red-700 font-bold';
+        else if (item.sugestao > 0) colorClass = 'bg-green-100 text-green-700 font-bold';
 
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td class="border px-4 py-2" data-codigo="${item.codigo}">${item.codigo}</td>
-                    <td class="border px-4 py-2">${item.descricao}</td>
-                    <td class="border px-4 py-2">${item.unidade}</td>
-                    <td class="border px-4 py-2">
-                        <input type="number" value="${item.saldo}" class="w-full p-1 border rounded" data-codigo="${item.codigo}" data-field="saldo" />
-                    </td>
-                    <td class="border px-4 py-2">
-                        <input type="number" value="${item.consumo}" class="w-full p-1 border rounded" data-codigo="${item.codigo}" data-field="consumo" />
-                    </td>
-                    <td class="border px-4 py-2">
-                        <input type="number" value="${item.sugestao}" class="w-full p-1 border rounded ${colorClass}" data-codigo="${item.codigo}" data-field="sugestao" readonly />
-                    </td>
-                `;
-                tableBody.appendChild(row);
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td class="border px-4 py-2" data-codigo="${item.codigo}">${item.codigo}</td>
+          <td class="border px-4 py-2">${item.descricao}</td>
+          <td class="border px-4 py-2">${item.unidade}</td>
+          <td class="border px-4 py-2">
+            <input type="number" value="${item.saldo}" class="w-full p-1 border rounded" data-codigo="${item.codigo}" data-field="saldo" />
+          </td>
+          <td class="border px-4 py-2">
+            <input type="number" value="${item.consumo}" class="w-full p-1 border rounded" data-codigo="${item.codigo}" data-field="consumo" />
+          </td>
+          <td class="border px-4 py-2">
+            <input type="number" value="${item.sugestao}" class="w-full p-1 border rounded ${colorClass}" data-codigo="${item.codigo}" data-field="sugestao" readonly />
+          </td>
+        `;
+        tableBody.appendChild(row);
 
-                // Atualizar sugestão ao alterar saldo ou consumo
-                const saldoInput = row.querySelector('input[data-field="saldo"]');
-                const consumoInput = row.querySelector('input[data-field="consumo"]');
-                const sugestaoInput = row.querySelector('input[data-field="sugestao"]');
+        const saldoInput = row.querySelector('input[data-field="saldo"]');
+        const consumoInput = row.querySelector('input[data-field="consumo"]');
+        const sugestaoInput = row.querySelector('input[data-field="sugestao"]');
 
-                function updateSugestao() {
-                    const saldoVal = parseInt(saldoInput.value) || 0;
-                    const consumoVal = parseInt(consumoInput.value) || 0;
-                    const sugestaoVal = consumoVal - saldoVal;
+        function updateSugestao() {
+          const saldoVal = parseInt(saldoInput.value) || 0;
+          const consumoVal = parseInt(consumoInput.value) || 0;
+          const sugestaoVal = consumoVal - saldoVal;
 
-                    sugestaoInput.value = sugestaoVal;
-                    sugestaoInput.classList.remove('bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700', 'font-bold');
+          sugestaoInput.value = sugestaoVal;
+          sugestaoInput.classList.remove('bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700', 'font-bold');
 
-                    if (sugestaoVal < 0) {
-                        sugestaoInput.classList.add('bg-red-100', 'text-red-700', 'font-bold');
-                    } else if (sugestaoVal > 0) {
-                        sugestaoInput.classList.add('bg-green-100', 'text-green-700', 'font-bold');
-                    }
-                }
-
-                saldoInput.addEventListener('input', updateSugestao);
-                consumoInput.addEventListener('input', updateSugestao);
-            });
+          if (sugestaoVal < 0) {
+            sugestaoInput.classList.add('bg-red-100', 'text-red-700', 'font-bold');
+          } else if (sugestaoVal > 0) {
+            sugestaoInput.classList.add('bg-green-100', 'text-green-700', 'font-bold');
+          }
         }
 
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.add('hidden'));
-            document.querySelectorAll('.tab-button').forEach(button => {
-                button.classList.remove('bg-white', 'border-t', 'border-l', 'border-r', 'rounded-t');
-                button.classList.add('bg-gray-200');
-            });
-            const tabContent = document.getElementById(tabName);
-            if (tabContent) tabContent.classList.remove('hidden');
-            const activeButton = document.querySelector(`button[data-tab="${tabName}"]`);
-            if (activeButton) {
-                activeButton.classList.add('bg-white', 'border-t', 'border-l', 'border-r', 'rounded-t');
-                activeButton.classList.remove('bg-gray-200');
-            }
-        }
+        saldoInput.addEventListener('input', updateSugestao);
+        consumoInput.addEventListener('input', updateSugestao);
+      });
+    }
 
-        function capitalizeFirstLetter(string) {
-            if (!string) return string;
-            return string.charAt(0).toUpperCase() + string.slice(1);
-        }
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.add('hidden'));
+      document.querySelectorAll('.tab-button').forEach(button => {
+        button.classList.remove('bg-white', 'border-t', 'border-l', 'border-r', 'rounded-t');
+        button.classList.add('bg-gray-200');
+      });
+      const tabContent = document.getElementById(tabName);
+      if (tabContent) tabContent.classList.remove('hidden');
+      const activeButton = document.querySelector(`button[data-tab="${tabName}"]`);
+      if (activeButton) {
+        activeButton.classList.add('bg-white', 'border-t', 'border-l', 'border-r', 'rounded-t');
+        activeButton.classList.remove('bg-gray-200');
+      }
+    }
 
-        async function submitAllOrders() {
-            const responsible = document.getElementById('responsible').value || '(não informado)';
-            const period = document.getElementById('period').value || '(não informado)';
+    function capitalizeFirstLetter(string) {
+      if (!string) return string;
+      return string.charAt(0).toUpperCase() + string.slice(1);
+    }
 
-            const allData = [];
+    async function submitAllOrders() {
+      const responsible = document.getElementById('responsible').value || '(não informado)';
+      const period = document.getElementById('period').value || '(não informado)';
 
-            for (const [tabKey, items] of Object.entries(data)) {
-                const tableBody = document.getElementById(`${tabKey}TableBody`);
-                if (!tableBody) continue;
-                const rows = tableBody.querySelectorAll('tr');
-                if (!rows.length) continue;
+      const allData = [];
 
-                allData.push([capitalizeFirstLetter(tabKey)]);
-                allData.push(['Responsável:', responsible]);
-                allData.push(['Período:', period]);
-                allData.push(['Código SMAR', 'Descrição completa', 'Unidade de Medida', 'Saldo Vivver', 'Consumo Médio', 'Sugestão de Pedido']);
+      for (const [tabKey, items] of Object.entries(data)) {
+        const tableBody = document.getElementById(`${tabKey}TableBody`);
+        if (!tableBody) continue;
+        const rows = tableBody.querySelectorAll('tr');
+        if (!rows.length) continue;
 
-                rows.forEach(row => {
-                    const codigo = row.cells[0].textContent.trim();
-                    const descricao = row.cells[1].textContent.trim();
-                    const unidade = row.cells[2].textContent.trim();
+        allData.push([capitalizeFirstLetter(tabKey)]);
+        allData.push(['Responsável:', responsible]);
+        allData.push(['Período:', period]);
+        allData.push(['Código SMAR', 'Descrição completa', 'Unidade de Medida', 'Saldo Vivver', 'Consumo Médio', 'Sugestão de Pedido']);
 
-                    const saldo = row.querySelector('input[data-field="saldo"]').value || 0;
-                    const consumo = row.querySelector('input[data-field="consumo"]').value || 0;
-                    const sugestao = row.querySelector('input[data-field="sugestao"]').value || 0;
+        rows.forEach(row => {
+          const codigo = row.cells[0].textContent.trim();
+          const descricao = row.cells[1].textContent.trim();
+          const unidade = row.cells[2].textContent.trim();
 
-                    allData.push([codigo, descricao, unidade, saldo, consumo, sugestao]);
-                });
+          const saldo = row.querySelector('input[data-field="saldo"]').value || 0;
+          const consumo = row.querySelector('input[data-field="consumo"]').value || 0;
+          const sugestao = row.querySelector('input[data-field="sugestao"]').value || 0;
 
-                allData.push(['', '', '', '', '', '']);
-            }
-
-            if (allData.length === 0) {
-                alert('Nenhum dado para enviar.');
-                return;
-            }
-
-            try {
-                document.getElementById('loading').classList.remove('hidden');
-                document.getElementById('status').classList.add('hidden');
-
-                const webAppUrl = 'https://script.google.com/macros/s/AKfycbwV7ruXZn1F6YjxFOfArdD2VyogyvVbCp9t0hlWgMaRt1Wf8SeGS9o5j9x-QC40Xkc/exec';
-
-                const response = await fetch(webAppUrl, {
-                    method: 'POST',
-                    body: JSON.stringify(allData),
-                    headers: { 'Content-Type': 'application/json' }
-                });
-
-                const text = await response.text();
-                document.getElementById('loading').classList.add('hidden');
-                const statusEl = document.getElementById('status');
-                statusEl.classList.remove('hidden');
-                statusEl.innerText = text;
-                statusEl.classList.remove('text-red-600');
-                statusEl.classList.add('text-green-600');
-            } catch (err) {
-                document.getElementById('loading').classList.add('hidden');
-                const statusEl = document.getElementById('status');
-                statusEl.classList.remove('hidden');
-                statusEl.innerText = 'Erro ao enviar pedido completo: ' + err.message;
-                statusEl.classList.remove('text-green-600');
-                statusEl.classList.add('text-red-600');
-                console.error(err);
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            Object.entries(data).forEach(([tabKey, items]) => renderTable(tabKey, items));
-
-            document.querySelectorAll('.tab-button').forEach(button => {
-                button.addEventListener('click', () => switchTab(button.dataset.tab));
-            });
-
-            document.getElementById('submitAllOrder').addEventListener('click', submitAllOrders);
-
-            switchTab('farmacia');
+          allData.push([codigo, descricao, unidade, saldo, consumo, sugestao]);
         });
-    </script>
+
+        allData.push(['', '', '', '', '', '']);
+      }
+
+      if (allData.length === 0) {
+        alert('Nenhum dado para enviar.');
+        return;
+      }
+
+      try {
+        document.getElementById('loading').classList.remove('hidden');
+        document.getElementById('status').classList.add('hidden');
+
+        const webAppUrl = 'https://script.google.com/macros/s/AKfycby_bMzZAhYY8Ot5mRUBJ2GvDF0x-jt9CTkCcqn5YrvDgOsd-n1yBcLQ0OT7tEmVjlpiFg/exec';
+
+        const response = await fetch(webAppUrl, {
+          method: 'POST',
+          body: JSON.stringify(allData),
+          headers: { 'Content-Type': 'application/json' }
+        });
+
+        const text = await response.text();
+        document.getElementById('loading').classList.add('hidden');
+        const statusEl = document.getElementById('status');
+        statusEl.classList.remove('hidden');
+        statusEl.innerText = text;
+        statusEl.classList.remove('text-red-600');
+        statusEl.classList.add('text-green-600');
+      } catch (err) {
+        document.getElementById('loading').classList.add('hidden');
+        const statusEl = document.getElementById('status');
+        statusEl.classList.remove('hidden');
+        statusEl.innerText = 'Erro ao enviar pedido completo: ' + err.message;
+        statusEl.classList.remove('text-green-600');
+        statusEl.classList.add('text-red-600');
+        console.error(err);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      Object.entries(data).forEach(([tabKey, items]) => renderTable(tabKey, items));
+
+      document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', () => switchTab(button.dataset.tab));
+      });
+
+      document.getElementById('submitAllOrder').addEventListener('click', submitAllOrders);
+
+      switchTab('farmacia');
+    });
+</script>
 </body>
 </html>
