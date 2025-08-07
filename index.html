@@ -228,7 +228,7 @@
                 document.getElementById('status').classList.add('hidden');
 
                 await gapi.client.sheets.spreadsheets.values.append({
-                    spreadsheetId: '1Zs-6wtRSIuWafwR2qlgI1kbFc9JC6jDHdmysjk1yBqw', // Replace with your Google Sheet ID
+                    spreadsheetId: 'YOUR_SPREADSHEET_ID', // Replace with your Google Sheet ID
                     range: `${tab.charAt(0).toUpperCase() + tab.slice(1)}!A1`, // e.g., Farmácia!A1, Odonto!A1
                     valueInputOption: 'RAW',
                     insertDataOption: 'INSERT_ROWS',
