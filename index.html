@@ -1,380 +1,276 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  
-  <meta http-equiv="Content-Security-Policy" content="
-    default-src 'self';
-    script-src 'self' https://cdn.tailwindcss.com https://apis.google.com https://accounts.google.com https://www.gstatic.com https://cdn.sheetjs.com 'unsafe-inline' 'unsafe-eval';
-    style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com;
-    img-src 'self' data:;
-    font-src 'self' https://fonts.gstatic.com;
-    connect-src https://sheets.googleapis.com https://www.googleapis.com https://accounts.google.com;
-    frame-src https://accounts.google.com https://content-sheets.googleapis.com;
-  " />
-
-  <title>Monthly Order Request System - USF Santa Maria</title>
-
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Google API JS -->
-  <script src="https://apis.google.com/js/api.js"></script>
-
-  <!-- SheetJS for Excel export -->
-  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
-
-  <style>
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monthly Order Request System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
 </head>
-<body class="bg-blue-50 font-sans">
-  <div class="container mx-auto p-4">
+<body class="bg-gray-100 font-sans">
+    <div class="container mx-auto p-4">
+        <!-- Header Section -->
+        <h1 class="text-3xl font-bold text-center mb-6">Monthly Order Request - USF Santa Maria</h1>
 
-    <h1 class="text-3xl font-bold text-center mb-6">PEDIDO MENSAL</h1>
+        <!-- Order Metadata Form -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-xl font-semibold mb-4">Order Details</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Responsible Person</label>
+                    <input id="responsible" type="text" value="Fabiano Oliveira Soares Leitão" class="mt-1 block w-full p-2 border rounded-md">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Period</label>
+                    <input id="period" type="text" value="30/05/2025 to 01/08/2025" class="mt-1 block w-full p-2 border rounded-md">
+                </div>
+            </div>
+        </div>
 
-    <div class="bg-white p-6 rounded-lg shadow-md mb-6">
-      <h2 class="text-xl font-semibold mb-4">Informações do pedido</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Responsável:</label>
-          <input id="responsible" type="text" class="mt-1 block w-full p-2 border rounded-md" />
+        <!-- Tabs Navigation -->
+        <div class="mb-4">
+            <ul class="flex border-b">
+                <li class="mr-1">
+                    <button class="tab-button bg-white px-4 py-2 font-semibold text-gray-700 border-t border-l border-r rounded-t" data-tab="farmacia">Farmácia</button>
+                </li>
+                <li class="mr-1">
+                    <button class="tab-button bg-gray-200 px-4 py-2 font-semibold text-gray-700" data-tab="odonto">Odonto</button>
+                </li>
+                <li class="mr-1">
+                    <button class="tab-button bg-gray-200 px-4 py-2 font-semibold text-gray-700" data-tab="enfermagem">Enfermagem</button>
+                </li>
+            </ul>
         </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Período:</label>
-          <input id="period" type="text" class="mt-1 block w-full p-2 border rounded-md" />
+
+        <!-- Tab Content -->
+        <div id="tab-content">
+            <!-- Farmácia Tab -->
+            <div id="farmacia" class="tab-pane bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">Farmácia Order Items</h2>
+                <div class="overflow-x-auto">
+                    <table id="farmaciaTable" class="min-w-full table-auto">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="px-4 py-2 text-left">Código SMAR</th>
+                                <th class="px-4 py-2 text-left">Descrição completa</th>
+                                <th class="px-4 py-2 text-left">Unidade de Medida</th>
+                                <th class="px-4 py-2 text-left">Saldo Vivver</th>
+                                <th class="px-4 py-2 text-left">Consumo Médio</th>
+                                <th class="px-4 py-2 text-left">Sugestão de Pedido</th>
+                            </tr>
+                        </thead>
+                        <tbody id="farmaciaTableBody"></tbody>
+                    </table>
+                </div>
+                <button class="submitOrder mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600" data-tab="farmacia">Submit Farmácia Order</button>
+            </div>
+
+            <!-- Odonto Tab -->
+            <div id="odonto" class="tab-pane hidden bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">Odonto Order Items</h2>
+                <div class="overflow-x-auto">
+                    <table id="odontoTable" class="min-w-full table-auto">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="px-4 py-2 text-left">Código SMAR</th>
+                                <th class="px-4 py-2 text-left">Descrição completa</th>
+                                <th class="px-4 py-2 text-left">Unidade de Medida</th>
+                                <th class="px-4 py-2 text-left">Saldo Vivver</th>
+                                <th class="px-4 py-2 text-left">Consumo Médio</th>
+                                <th class="px-4 py-2 text-left">Sugestão de Pedido</th>
+                            </tr>
+                        </thead>
+                        <tbody id="odontoTableBody"></tbody>
+                    </table>
+                </div>
+                <button class="submitOrder mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600" data-tab="odonto">Submit Odonto Order</button>
+            </div>
+
+            <!-- Enfermagem Tab -->
+            <div id="enfermagem" class="tab-pane hidden bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">Enfermagem Order Items</h2>
+                <div class="overflow-x-auto">
+                    <table id="enfermagemTable" class="min-w-full table-auto">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="px-4 py-2 text-left">Código SMAR</th>
+                                <th class="px-4 py-2 text-left">Descrição completa</th>
+                                <th class="px-4 py-2 text-left">Unidade de Medida</th>
+                                <th class="px-4 py-2 text-left">Saldo Vivver</th>
+                                <th class="px-4 py-2 text-left">Consumo Médio</th>
+                                <th class="px-4 py-2 text-left">Sugestão de Pedido</th>
+                            </tr>
+                        </thead>
+                        <tbody id="enfermagemTableBody"></tbody>
+                    </table>
+                </div>
+                <button class="submitOrder mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600" data-tab="enfermagem">Submit Enfermagem Order</button>
+            </div>
         </div>
-      </div>
+
+        <!-- Loading Message -->
+        <div id="loading" class="hidden text-center mt-4 text-gray-600">Loading...</div>
+        <!-- Status Message -->
+        <div id="status" class="hidden text-center mt-4"></div>
     </div>
 
-    <div class="mb-4 overflow-auto">
-      <ul class="flex border-b whitespace-nowrap min-w-max">
-        <li class="mr-1"><button class="tab-button bg-white px-4 py-2 font-semibold text-gray-700 border-t border-l border-r rounded-t" data-tab="farmacia">Farmácia</button></li>
-        <li class="mr-1"><button class="tab-button bg-gray-200 px-4 py-2 font-semibold text-gray-700" data-tab="psicotropicos">Psicotrópicos</button></li>
-        <li class="mr-1"><button class="tab-button bg-gray-200 px-4 py-2 font-semibold text-gray-700" data-tab="enfermagem">Enfermagem</button></li>
-        <!-- Adicione outras abas conforme necessário -->
-      </ul>
-    </div>
+    <script>
+        // Sample data from Excel sheets (subset for brevity)
+        const data = {
+            farmacia: [
+                { codigo: "1 01 06 0001 7", descricao: "Aciclovir 200mg comprimido", unidade: "Comprimido", saldo: 1000, consumo: 770, sugestao: -230 },
+                { codigo: "1 01 06 002 5", descricao: "Aciclovir 50mg/g creme bisnaga", unidade: "Bisnaga", saldo: 15, consumo: 15, sugestao: 0 },
+                { codigo: "1 01 03 0001 3", descricao: "Ácido acetilsalicílico 100mg comprimido", unidade: "Comprimido", saldo: 2000, consumo: 6000, sugestao: 4000 },
+                { codigo: "1 01 09 0001 0", descricao: "Ácido fólico 5mg comprimido", unidade: "Comprimido", saldo: 400, consumo: 1100, sugestao: 700 }
+            ],
+            odonto: [
+                { codigo: "1 07 01 0001 0", descricao: "Ácido condicionador para resina foto", unidade: "Frasco", saldo: 0, consumo: 1, sugestao: 1 },
+                { codigo: "1 07 01 0002 9", descricao: "Agulha curta para anestesia", unidade: "Caixa", saldo: 0, consumo: 0, sugestao: 0 },
+                { codigo: "1 07 01 0086 0", descricao: "Máscara cirúrgica descartável", unidade: "Unidade", saldo: 0, consumo: 100, sugestao: 100 },
+                { codigo: "1 07 01 0093 2", descricao: "Óxido zinco pó", unidade: "Unidade", saldo: 0, consumo: 1, sugestao: 1 }
+            ],
+            enfermagem: [
+                { codigo: "1 02 12 0001 5", descricao: "Abaixador de lingua de madeira (Pacote c/ 100 unidades)", unidade: "Pacote", saldo: 2, consumo: 2, sugestao: 0 },
+                { codigo: "1 02 03 0001 6", descricao: "Ácido graxo essencial (Age)", unidade: "Frasco", saldo: 6, consumo: 3, sugestao: -3 },
+                { codigo: "1 02 01 0004 1", descricao: "Agulha descartável hipodérmica 25 x 7 mm", unidade: "Unidade", saldo: 200, consumo: 157, sugestao: -43 },
+                { codigo: "1 02 11 0005 3", descricao: "Álcool 70º (Antisséptico e bactericida)", unidade: "Litro", saldo: 8, consumo: 10, sugestao: 2 }
+            ]
+        };
 
-    <div id="tab-content">
-      <!-- Farmácia -->
-      <div id="farmacia" class="tab-pane bg-white p-6 rounded-lg shadow-md">
-        <h2 class="text-xl font-semibold mb-4">Farmácia</h2>
-        <div class="overflow-x-auto">
-          <table id="farmaciaTable" class="min-w-full table-auto">
-            <thead>
-              <tr class="bg-gray-200">
-                <th class="px-4 py-2 text-left">Código SMAR</th>
-                <th class="px-4 py-2 text-left">Descrição completa</th>
-                <th class="px-4 py-2 text-left">Unidade de Medida</th>
-                <th class="px-4 py-2 text-left">Saldo Vivver</th>
-                <th class="px-4 py-2 text-left">Consumo Médio</th>
-                <th class="px-4 py-2 text-left">Sugestão de Pedido</th>
-              </tr>
-            </thead>
-            <tbody id="farmaciaTableBody"></tbody>
-          </table>
-        </div>
-      </div>
+        // Rendering table for a specific tab
+        function renderTable(tab, items) {
+            const tableBody = document.getElementById(`${tab}TableBody`);
+            tableBody.innerHTML = '';
+            items.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="border px-4 py-2">${item.codigo}</td>
+                    <td class="border px-4 py-2">${item.descricao}</td>
+                    <td class="border px-4 py-2">${item.unidade}</td>
+                    <td class="border px-4 py-2">
+                        <input type="number" value="${item.saldo}" class="w-full p-1 border rounded" data-codigo="${item.codigo}" data-field="saldo">
+                    </td>
+                    <td class="border px-4 py-2">
+                        <input type="number" value="${item.consumo}" class="w-full p-1 border rounded" data-codigo="${item.codigo}" data-field="consumo">
+                    </td>
+                    <td class="border px-4 py-2">
+                        <input type="number" value="${item.sugestao}" class="w-full p-1 border rounded" data-codigo="${item.codigo}" data-field="sugestao" readonly>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
 
-      <!-- Psicotrópicos -->
-      <div id="psicotropicos" class="tab-pane hidden bg-white p-6 rounded-lg shadow-md">
-        <h2 class="text-xl font-semibold mb-4">Psicotrópicos</h2>
-        <div class="overflow-x-auto">
-          <table id="psicotropicosTable" class="min-w-full table-auto">
-            <thead>
-              <tr class="bg-gray-200">
-                <th class="px-4 py-2 text-left">Código SMAR</th>
-                <th class="px-4 py-2 text-left">Descrição completa</th>
-                <th class="px-4 py-2 text-left">Unidade de Medida</th>
-                <th class="px-4 py-2 text-left">Saldo Vivver</th>
-                <th class="px-4 py-2 text-left">Consumo Médio</th>
-                <th class="px-4 py-2 text-left">Sugestão de Pedido</th>
-              </tr>
-            </thead>
-            <tbody id="psicotropicosTableBody"></tbody>
-          </table>
-        </div>
-      </div>
+            // Adding event listeners for dynamic calculation
+            document.querySelectorAll(`#${tab}TableBody input[data-field="saldo"], #${tab}TableBody input[data-field="consumo"]`).forEach(input => {
+                input.addEventListener('input', () => {
+                    const codigo = input.dataset.codigo;
+                    const row = input.closest('tr');
+                    const saldoInput = row.querySelector('input[data-field="saldo"]');
+                    const consumoInput = row.querySelector('input[data-field="consumo"]');
+                    const sugestaoInput = row.querySelector('input[data-field="sugestao"]');
+                    const saldo = parseInt(saldoInput.value) || 0;
+                    const consumo = parseInt(consumoInput.value) || 0;
+                    sugestaoInput.value = consumo - saldo; // Calculate Sugestão de Pedido
+                });
+            });
+        }
 
-      <!-- Enfermagem -->
-      <div id="enfermagem" class="tab-pane hidden bg-white p-6 rounded-lg shadow-md">
-        <h2 class="text-xl font-semibold mb-4">Enfermagem</h2>
-        <div class="overflow-x-auto">
-          <table id="enfermagemTable" class="min-w-full table-auto">
-            <thead>
-              <tr class="bg-gray-200">
-                <th class="px-4 py-2 text-left">Código SMAR</th>
-                <th class="px-4 py-2 text-left">Descrição completa</th>
-                <th class="px-4 py-2 text-left">Unidade de Medida</th>
-                <th class="px-4 py-2 text-left">Saldo Vivver</th>
-                <th class="px-4 py-2 text-left">Consumo Médio</th>
-                <th class="px-4 py-2 text-left">Sugestão de Pedido</th>
-              </tr>
-            </thead>
-            <tbody id="enfermagemTableBody"></tbody>
-          </table>
-        </div>
-      </div>
+        // Tab switching logic
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.add('hidden'));
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('bg-white', 'border-t', 'border-l', 'border-r', 'rounded-t');
+                button.classList.add('bg-gray-200');
+            });
+            document.getElementById(tabName).classList.remove('hidden');
+            document.querySelector(`button[data-tab="${tabName}"]`).classList.add('bg-white', 'border-t', 'border-l', 'border-r', 'rounded-t');
+            document.querySelector(`button[data-tab="${tabName}"]`).classList.remove('bg-gray-200');
+        }
 
-      <!-- Adicione outras abas aqui -->
+        // Initializing Google API Client
+        function initGoogleSheets() {
+            gapi.load('client:auth2', () => {
+                gapi.client.init({
+                    apiKey: 'YOUR_API_KEY', // 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
+                    clientId: 'YOUR_CLIENT_ID', // 932159734645-tm1ris8v71anr72ctlocp8keorsv4sn7.apps.googleusercontent.com
+                    scope: 'https://www.googleapis.com/auth/spreadsheets',
+                    discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4']
+                }).then(() => {
+                    console.log('Google API initialized');
+                }).catch(err => console.error('Error initializing Google API:', err));
+            });
+        }
 
-    </div>
+        // Submitting order to Google Sheets
+        async function submitOrder(tab) {
+            const responsible = document.getElementById('responsible').value;
+            const period = document.getElementById('period').value;
+            const rows = document.querySelectorAll(`#${tab}TableBody tr`);
+            const orderData = Array.from(rows).map(row => {
+                const inputs = row.querySelectorAll('input');
+                return {
+                    codigo: inputs[0].dataset.codigo,
+                    saldo: parseInt(inputs[0].value) || 0,
+                    consumo: parseInt(inputs[1].value) || 0,
+                    sugestao: parseInt(inputs[2].value) || 0
+                };
+            });
 
-    <div class="text-center mt-6">
-      <button id="submitAllOrder" class="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 font-semibold" disabled>
-        Enviar pedido completo
-      </button>
-    </div>
+            const values = [
+                ['Responsible', responsible],
+                ['Period', period],
+                ['Código SMAR', 'Saldo Vivver', 'Consumo Médio', 'Sugestão de Pedido'],
+                ...orderData.map(item => [item.codigo, item.saldo, item.consumo, item.sugestao])
+            ];
 
-    <div id="loading" class="hidden text-center mt-4 text-gray-600">Loading...</div>
-    <div id="status" class="hidden text-center mt-4"></div>
-  </div>
+            try {
+                document.getElementById('loading').classList.remove('hidden');
+                document.getElementById('status').classList.add('hidden');
 
-  <script>
-    // Dados de exemplo
-    const data = {
-      farmacia: [
-        { codigo: "1 01 06 0001 7", descricao: "Aciclovir 200mg comprimido", unidade: "Comprimido", saldo: 1000, consumo: 770, sugestao: -230 },
-        { codigo: "1 01 06 002 5", descricao: "Aciclovir 50mg/g creme bisnaga", unidade: "Bisnaga", saldo: 15, consumo: 15, sugestao: 0 },
-        { codigo: "1 01 03 0001 3", descricao: "Ácido acetilsalicílico 100mg comprimido", unidade: "Comprimido", saldo: 2000, consumo: 6000, sugestao: 4000 },
-        { codigo: "1 01 09 0001 0", descricao: "Ácido fólico 5mg comprimido", unidade: "Comprimido", saldo: 400, consumo: 1100, sugestao: 700 }
-      ],
-      psicotropicos: [],
-      enfermagem: [
-        { codigo: "1 02 12 0001 5", descricao: "Abaixador de lingua de madeira (Pacote c/ 100 unidades)", unidade: "Pacote", saldo: 2, consumo: 2, sugestao: 0 },
-        { codigo: "1 02 03 0001 6", descricao: "Ácido graxo essencial (Age)", unidade: "Frasco", saldo: 6, consumo: 3, sugestao: -3 },
-        { codigo: "1 02 01 0004 1", descricao: "Agulha descartável hipodérmica 25 x 7 mm", unidade: "Unidade", saldo: 200, consumo: 157, sugestao: -43 },
-        { codigo: "1 02 11 0005 3", descricao: "Álcool 70º (Antisséptico e bactericida)", unidade: "Litro", saldo: 8, consumo: 10, sugestao: 2 }
-      ]
-    };
+                await gapi.client.sheets.spreadsheets.values.append({
+                    spreadsheetId: '1Zs-6wtRSIuWafwR2qlgI1kbFc9JC6jDHdmysjk1yBqw', // Replace with your Google Sheet ID
+                    range: `${tab.charAt(0).toUpperCase() + tab.slice(1)}!A1`, // e.g., Farmácia!A1, Odonto!A1
+                    valueInputOption: 'RAW',
+                    insertDataOption: 'INSERT_ROWS',
+                    resource: { values }
+                });
 
-    function renderTable(tab, items) {
-      const tableBody = document.getElementById(`${tab}TableBody`);
-      if (!tableBody) return;
-
-      tableBody.innerHTML = '';
-      items.forEach(item => {
-        let colorClass = '';
-        if (item.sugestao < 0) colorClass = 'bg-red-100 text-red-700 font-bold';
-        else if (item.sugestao > 0) colorClass = 'bg-green-100 text-green-700 font-bold';
-
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td class="border px-4 py-2" data-codigo="${item.codigo}">${item.codigo}</td>
-          <td class="border px-4 py-2">${item.descricao}</td>
-          <td class="border px-4 py-2">${item.unidade}</td>
-          <td class="border px-4 py-2">
-            <input type="number" value="${item.saldo}" class="w-full p-1 border rounded" data-codigo="${item.codigo}" data-field="saldo" />
-          </td>
-          <td class="border px-4 py-2">
-            <input type="number" value="${item.consumo}" class="w-full p-1 border rounded" data-codigo="${item.codigo}" data-field="consumo" />
-          </td>
-          <td class="border px-4 py-2">
-            <input type="number" value="${item.sugestao}" class="w-full p-1 border rounded ${colorClass}" data-codigo="${item.codigo}" data-field="sugestao" readonly />
-          </td>
-        `;
-        tableBody.appendChild(row);
-      });
-
-      document.querySelectorAll(`#${tab}TableBody input[data-field="saldo"], #${tab}TableBody input[data-field="consumo"]`).forEach(input => {
-        input.addEventListener('input', () => {
-          const row = input.closest('tr');
-          const saldoInput = row.querySelector('input[data-field="saldo"]');
-          const consumoInput = row.querySelector('input[data-field="consumo"]');
-          const sugestaoInput = row.querySelector('input[data-field="sugestao"]');
-
-          const saldo = parseInt(saldoInput.value) || 0;
-          const consumo = parseInt(consumoInput.value) || 0;
-          const sugestao = consumo - saldo;
-
-          sugestaoInput.value = sugestao;
-
-          sugestaoInput.classList.remove('bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700', 'font-bold');
-
-          if (sugestao < 0) {
-            sugestaoInput.classList.add('bg-red-100', 'text-red-700', 'font-bold');
-          } else if (sugestao > 0) {
-            sugestaoInput.classList.add('bg-green-100', 'text-green-700', 'font-bold');
-          }
-        });
-      });
-    }
-
-    function switchTab(tabName) {
-      document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.add('hidden'));
-      document.querySelectorAll('.tab-button').forEach(button => {
-        button.classList.remove('bg-white', 'border-t', 'border-l', 'border-r', 'rounded-t');
-        button.classList.add('bg-gray-200');
-      });
-      const tabContent = document.getElementById(tabName);
-      if (tabContent) tabContent.classList.remove('hidden');
-      const activeButton = document.querySelector(`button[data-tab="${tabName}"]`);
-      if (activeButton) {
-        activeButton.classList.add('bg-white', 'border-t', 'border-l', 'border-r', 'rounded-t');
-        activeButton.classList.remove('bg-gray-200');
-      }
-    }
-
-    function capitalizeFirstLetter(string) {
-      if (!string) return string;
-      return string.charAt(0).toUpperCase() + string.slice(1);
-    }
-
-    function initGoogleSheets() {
-      const btnEnviar = document.getElementById('submitAllOrder');
-      btnEnviar.disabled = true;
-      btnEnviar.classList.add('opacity-50', 'cursor-not-allowed');
-
-      gapi.load('client:auth2', () => {
-        gapi.client.init({
-          apiKey: 'AIzaSyBn_143qLcYCEzs_iNOs-CMCy1zVuHon44',
-          clientId: '932159734645-hbo3liknnqia98jip475pngflpgk2818.apps.googleusercontent.com',
-          scope: 'https://www.googleapis.com/auth/spreadsheets',
-          discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4']
-        }).then(() => {
-          const authInstance = gapi.auth2.getAuthInstance();
-
-          function updateSigninStatus(isSignedIn) {
-            if (isSignedIn) {
-              console.log('Usuário autenticado.');
-              btnEnviar.disabled = false;
-              btnEnviar.classList.remove('opacity-50', 'cursor-not-allowed');
-            } else {
-              console.log('Usuário não autenticado, solicitando login...');
-              btnEnviar.disabled = true;
-              btnEnviar.classList.add('opacity-50', 'cursor-not-allowed');
-              authInstance.signIn().catch(err => {
-                console.error('Login falhou:', err);
-                alert('Falha ao autenticar. Atualize a página e tente novamente.');
-              });
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('status').classList.remove('hidden');
+                document.getElementById('status').innerText = `Order for ${tab} submitted successfully!`;
+                document.getElementById('status').classList.add('text-green-600');
+            } catch (err) {
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('status').classList.remove('hidden');
+                document.getElementById('status').innerText = `Error submitting order for ${tab}: ${err.message}`;
+                document.getElementById('status').classList.add('text-red-600');
+                console.error(`Error submitting to Google Sheets for ${tab}:`, err);
             }
-          }
-
-          updateSigninStatus(authInstance.isSignedIn.get());
-          authInstance.isSignedIn.listen(updateSigninStatus);
-        }).catch(err => {
-          console.error('Erro inicializando Google API:', err);
-          alert('Erro ao inicializar Google API. Veja o console para detalhes.');
-        });
-      });
-    }
-
-    function downloadExcel(allData) {
-      const ws = XLSX.utils.aoa_to_sheet(allData);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Pedido Completo");
-
-      const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-      const blob = new Blob([wbout], { type: 'application/octet-stream' });
-      const url = URL.createObjectURL(blob);
-
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `Pedido_Completo_${new Date().toISOString().slice(0,10)}.xlsx`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-
-      URL.revokeObjectURL(url);
-    }
-
-    async function submitAllOrders() {
-      const btnEnviar = document.getElementById('submitAllOrder');
-      btnEnviar.disabled = true;
-      btnEnviar.classList.add('opacity-50', 'cursor-not-allowed');
-
-      document.getElementById('loading').classList.remove('hidden');
-      document.getElementById('status').classList.add('hidden');
-
-      try {
-        if (!gapi.client.sheets) throw new Error('API do Sheets não está carregada.');
-
-        const responsible = document.getElementById('responsible').value || '(não informado)';
-        const period = document.getElementById('period').value || '(não informado)';
-
-        const allData = [];
-
-        for (const tabKey of Object.keys(data)) {
-          const tableBody = document.getElementById(`${tabKey}TableBody`);
-          if (!tableBody) continue;
-          const rows = tableBody.querySelectorAll('tr');
-          if (!rows.length) continue;
-
-          allData.push([capitalizeFirstLetter(tabKey)]);
-          allData.push(['Responsável:', responsible]);
-          allData.push(['Período:', period]);
-          allData.push(['Código SMAR', 'Descrição completa', 'Unidade de Medida', 'Saldo Vivver', 'Consumo Médio', 'Sugestão de Pedido']);
-
-          rows.forEach(row => {
-            const codigo = row.cells[0].textContent.trim();
-            const descricao = row.cells[1].textContent.trim();
-            const unidade = row.cells[2].textContent.trim();
-
-            const saldo = row.querySelector('input[data-field="saldo"]').value || 0;
-            const consumo = row.querySelector('input[data-field="consumo"]').value || 0;
-            const sugestao = row.querySelector('input[data-field="sugestao"]').value || 0;
-
-            allData.push([codigo, descricao, unidade, saldo, consumo, sugestao]);
-          });
-
-          allData.push(['', '', '', '', '', '']); // separação entre setores
         }
 
-        if (allData.length === 0) {
-          alert('Nenhum dado para enviar.');
-          return;
-        }
+        // Initializing page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Render tables for each tab
+            renderTable('farmacia', data.farmacia);
+            renderTable('odonto', data.odonto);
+            renderTable('enfermagem', data.enfermagem);
 
-        await gapi.client.sheets.spreadsheets.values.append({
-          spreadsheetId: '1Zs-6wtRSIuWafwR2qlgI1kbFc9JC6jDHdmysjk1yBqw',
-          range: `PedidoCompleto!A1`,
-          valueInputOption: 'RAW',
-          insertDataOption: 'INSERT_ROWS',
-          resource: { values: allData }
+            // Initialize tab switching
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.addEventListener('click', () => switchTab(button.dataset.tab));
+            });
+
+            // Initialize submit buttons
+            document.querySelectorAll('.submitOrder').forEach(button => {
+                button.addEventListener('click', () => submitOrder(button.dataset.tab));
+            });
+
+            // Initialize Google Sheets API
+            initGoogleSheets();
+
+            // Show Farmácia tab by default
+            switchTab('farmacia');
         });
-
-        document.getElementById('loading').classList.add('hidden');
-        document.getElementById('status').classList.remove('hidden');
-        document.getElementById('status').innerText = 'Pedido completo enviado com sucesso!';
-        document.getElementById('status').classList.remove('text-red-600');
-        document.getElementById('status').classList.add('text-green-600');
-
-        downloadExcel(allData);
-
-      } catch (err) {
-        document.getElementById('loading').classList.add('hidden');
-        document.getElementById('status').classList.remove('hidden');
-
-        const errorMsg = err && err.message ? err.message : JSON.stringify(err);
-        document.getElementById('status').innerText = `Erro ao enviar pedido completo: ${errorMsg}`;
-        document.getElementById('status').classList.remove('text-green-600');
-        document.getElementById('status').classList.add('text-red-600');
-
-        console.error('Erro ao enviar pedido completo para Google Sheets:', err);
-      } finally {
-        btnEnviar.disabled = false;
-        btnEnviar.classList.remove('opacity-50', 'cursor-not-allowed');
-      }
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      Object.entries(data).forEach(([tabKey, items]) => renderTable(tabKey, items));
-
-      document.querySelectorAll('.tab-button').forEach(button => {
-        button.addEventListener('click', () => switchTab(button.dataset.tab));
-      });
-
-      initGoogleSheets();
-
-      document.getElementById('submitAllOrder').addEventListener('click', submitAllOrders);
-
-      switchTab('farmacia');
-    });
-  </script>
+    </script>
 </body>
 </html>
