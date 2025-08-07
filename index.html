@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
+  
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self' https://cdn.tailwindcss.com https://apis.google.com https://accounts.google.com https://www.gstatic.com 'unsafe-inline' 'unsafe-eval';
+    script-src 'self' https://cdn.tailwindcss.com https://apis.google.com https://accounts.google.com https://www.gstatic.com https://cdn.sheetjs.com 'unsafe-inline' 'unsafe-eval';
     style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com;
     img-src 'self' data:;
     font-src 'self' https://fonts.gstatic.com;
@@ -56,7 +56,7 @@
         <li class="mr-1"><button class="tab-button bg-white px-4 py-2 font-semibold text-gray-700 border-t border-l border-r rounded-t" data-tab="farmacia">Farmácia</button></li>
         <li class="mr-1"><button class="tab-button bg-gray-200 px-4 py-2 font-semibold text-gray-700" data-tab="psicotropicos">Psicotrópicos</button></li>
         <li class="mr-1"><button class="tab-button bg-gray-200 px-4 py-2 font-semibold text-gray-700" data-tab="enfermagem">Enfermagem</button></li>
-        <!-- Adicione outras abas se desejar -->
+        <!-- Adicione outras abas conforme necessário -->
       </ul>
     </div>
 
@@ -121,7 +121,7 @@
         </div>
       </div>
 
-      <!-- Adicione outras abas conforme for necessário -->
+      <!-- Adicione outras abas aqui -->
 
     </div>
 
@@ -136,7 +136,7 @@
   </div>
 
   <script>
-    // Dados de exemplo para popular as tabelas (substitua pelos seus dados reais)
+    // Dados de exemplo
     const data = {
       farmacia: [
         { codigo: "1 01 06 0001 7", descricao: "Aciclovir 200mg comprimido", unidade: "Comprimido", saldo: 1000, consumo: 770, sugestao: -230 },
@@ -153,7 +153,6 @@
       ]
     };
 
-    // Renderização da tabela com inputs editáveis para saldo e consumo
     function renderTable(tab, items) {
       const tableBody = document.getElementById(`${tab}TableBody`);
       if (!tableBody) return;
@@ -182,7 +181,6 @@
         tableBody.appendChild(row);
       });
 
-      // Atualiza sugestão ao modificar saldo ou consumo
       document.querySelectorAll(`#${tab}TableBody input[data-field="saldo"], #${tab}TableBody input[data-field="consumo"]`).forEach(input => {
         input.addEventListener('input', () => {
           const row = input.closest('tr');
@@ -207,7 +205,6 @@
       });
     }
 
-    // Troca de abas
     function switchTab(tabName) {
       document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.add('hidden'));
       document.querySelectorAll('.tab-button').forEach(button => {
@@ -223,13 +220,11 @@
       }
     }
 
-    // Capitaliza a primeira letra da string
     function capitalizeFirstLetter(string) {
       if (!string) return string;
       return string.charAt(0).toUpperCase() + string.slice(1);
     }
 
-    // Inicializa a API do Google Sheets, trata login OAuth2
     function initGoogleSheets() {
       const btnEnviar = document.getElementById('submitAllOrder');
       btnEnviar.disabled = true;
@@ -237,8 +232,8 @@
 
       gapi.load('client:auth2', () => {
         gapi.client.init({
-          apiKey: 'AIzaSyBn_143qLcYCEzs_iNOs-CMCy1zVuHon44',  // Sua API Key
-          clientId: '932159734645-hbo3liknnqia98jip475pngflpgk2818.apps.googleusercontent.com',  // Seu Client ID
+          apiKey: 'AIzaSyBn_143qLcYCEzs_iNOs-CMCy1zVuHon44',
+          clientId: '932159734645-hbo3liknnqia98jip475pngflpgk2818.apps.googleusercontent.com',
           scope: 'https://www.googleapis.com/auth/spreadsheets',
           discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4']
         }).then(() => {
@@ -269,7 +264,6 @@
       });
     }
 
-    // Gera arquivo Excel e inicia download com SheetJS
     function downloadExcel(allData) {
       const ws = XLSX.utils.aoa_to_sheet(allData);
       const wb = XLSX.utils.book_new();
@@ -289,7 +283,6 @@
       URL.revokeObjectURL(url);
     }
 
-    // Envia os dados para Google Sheets e dispara download do Excel
     async function submitAllOrders() {
       const btnEnviar = document.getElementById('submitAllOrder');
       btnEnviar.disabled = true;
@@ -299,9 +292,7 @@
       document.getElementById('status').classList.add('hidden');
 
       try {
-        if (!gapi.client.sheets) {
-          throw new Error('API do Sheets não está carregada.');
-        }
+        if (!gapi.client.sheets) throw new Error('API do Sheets não está carregada.');
 
         const responsible = document.getElementById('responsible').value || '(não informado)';
         const period = document.getElementById('period').value || '(não informado)';
@@ -331,7 +322,7 @@
             allData.push([codigo, descricao, unidade, saldo, consumo, sugestao]);
           });
 
-          allData.push(['', '', '', '', '', '']); // Espaço entre setores
+          allData.push(['', '', '', '', '', '']); // separação entre setores
         }
 
         if (allData.length === 0) {
@@ -340,7 +331,7 @@
         }
 
         await gapi.client.sheets.spreadsheets.values.append({
-          spreadsheetId: '1Zs-6wtRSIuWafwR2qlgI1kbFc9JC6jDHdmysjk1yBqw',  // Seu Spreadsheet ID
+          spreadsheetId: '1Zs-6wtRSIuWafwR2qlgI1kbFc9JC6jDHdmysjk1yBqw',
           range: `PedidoCompleto!A1`,
           valueInputOption: 'RAW',
           insertDataOption: 'INSERT_ROWS',
@@ -353,7 +344,6 @@
         document.getElementById('status').classList.remove('text-red-600');
         document.getElementById('status').classList.add('text-green-600');
 
-        // Dispara o download do Excel
         downloadExcel(allData);
 
       } catch (err) {
