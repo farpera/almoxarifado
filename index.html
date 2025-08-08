@@ -2,6 +2,746 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Monthly Order Request System - USF Santa Maria</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <style>
+      /* Ajusta a largura mínima da coluna Código SMAR na tabela Farmácia */
+      #farmaciaTable th:first-child,
+      #farmaciaTable td:first-child {
+        min-width: 180px; /* ajuste conforme necessário */
+        white-space: nowrap;
+      }
+    </style>
+</head>
+<body class="bg-blue-50 font-sans">
+    <div class="container mx-auto p-4">
+        <!-- Header Section -->
+        <h1 class="text-3xl font-bold text-center mb-6">PEDIDO MENSAL</h1>
+
+        <!-- Order Metadata Form -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-xl font-semibold mb-4">Informações do pedido</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Responsável:</label>
+                    <input id="responsible" type="text" value="" class="mt-1 block w-full p-2 border rounded-md" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Unidade Solicitante:</label>
+                    <input id="requestingUnit" type="text" value="" class="mt-1 block w-full p-2 border rounded-md" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Período:</label>
+                    <input id="period" type="text" value="" class="mt-1 block w-full p-2 border rounded-md" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <div class="mb-4 overflow-auto">
+            <ul class="flex border-b whitespace-nowrap min-w-max">
+                <li class="mr-1">
+                    <button class="tab-button bg-white px-4 py-2 font-semibold text-gray-700 border-t border-l border-r rounded-t" data-tab="farmacia">Farmácia</button>
+                </li>
+                <li class="mr-1">
+                    <button class="tab-button bg-gray-200 px-4 py-2 font-semibold text-gray-700" data-tab="psicotropicos">Psicotrópicos</button>
+                </li>
+                <li class="mr-1">
+                    <button class="tab-button bg-gray-200 px-4 py-2 font-semibold text-gray-700" data-tab="enfermagem">Enfermagem</button>
+                </li>
+                <li class="mr-1">
+                    <button class="tab-button bg-gray-200 px-4 py-2 font-semibold text-gray-700" data-tab="enfermagemDST">Enfermagem DST</button>
+                </li>
+                <li class="mr-1">
+                    <button class="tab-button bg-gray-200 px-4 py-2 font-semibold text-gray-700" data-tab="enfermagemUrgenciaEmergencia">Enfermagem Urgência e Emergência</button>
+                </li>
+                <li class="mr-1">
+                    <button class="tab-button bg-gray-200 px-4 py-2 font-semibold text-gray-700" data-tab="odonto">Odonto</button>
+                </li>
+                <li class="mr-1">
+                    <button class="tab-button bg-gray-200 px-4 py-2 font-semibold text-gray-700" data-tab="odontoInstrumental">Odonto Instrumental</button>
+                </li>
+                <li class="mr-1">
+                    <button class="tab-button bg-gray-200 px-4 py-2 font-semibold text-gray-700" data-tab="consumoLimpezaPeriodico">Consumo e Limpeza Periódico</button>
+                </li>
+                <li class="mr-1">
+                    <button class="tab-button bg-gray-200 px-4 py-2 font-semibold text-gray-700" data-tab="consumoLimpezaEsporadico">Consumo e Limpeza Esporádico</button>
+                </li>
+                <li class="mr-1">
+                    <button class="tab-button bg-gray-200 px-4 py-2 font-semibold text-gray-700" data-tab="impressosMateriaisEscritorio">Impressos e Materiais de Escritório</button>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Tab Content -->
+        <div id="tab-content">
+
+            <!-- Farmácia -->
+            <div id="farmacia" class="tab-pane bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">Farmácia</h2>
+                <div class="overflow-x-auto">
+                    <table id="farmaciaTable" class="min-w-full table-auto">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="px-4 py-2 text-left">Código SMAR</th>
+                                <th class="px-4 py-2 text-left">Descrição completa</th>
+                                <th class="px-4 py-2 text-left">Unidade de Medida</th>
+                                <th class="px-4 py-2 text-left">Saldo Vivver</th>
+                                <th class="px-4 py-2 text-left">Consumo Médio</th>
+                                <th class="px-4 py-2 text-left">Sugestão de Pedido</th>
+                            </tr>
+                        </thead>
+                        <tbody id="farmaciaTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Psicotrópicos -->
+            <div id="psicotropicos" class="tab-pane hidden bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">Psicotrópicos Order Items</h2>
+                <div class="overflow-x-auto">
+                    <table id="psicotropicosTable" class="min-w-full table-auto">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="px-4 py-2 text-left">Código SMAR</th>
+                                <th class="px-4 py-2 text-left">Descrição completa</th>
+                                <th class="px-4 py-2 text-left">Unidade de Medida</th>
+                                <th class="px-4 py-2 text-left">Saldo Vivver</th>
+                                <th class="px-4 py-2 text-left">Consumo Médio</th>
+                                <th class="px-4 py-2 text-left">Sugestão de Pedido</th>
+                            </tr>
+                        </thead>
+                        <tbody id="psicotropicosTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Enfermagem -->
+            <div id="enfermagem" class="tab-pane hidden bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">Enfermagem Order Items</h2>
+                <div class="overflow-x-auto">
+                    <table id="enfermagemTable" class="min-w-full table-auto">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="px-4 py-2 text-left">Código SMAR</th>
+                                <th class="px-4 py-2 text-left">Descrição completa</th>
+                                <th class="px-4 py-2 text-left">Unidade de Medida</th>
+                                <th class="px-4 py-2 text-left">Saldo Vivver</th>
+                                <th class="px-4 py-2 text-left">Consumo Médio</th>
+                                <th class="px-4 py-2 text-left">Sugestão de Pedido</th>
+                            </tr>
+                        </thead>
+                        <tbody id="enfermagemTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Enfermagem DST -->
+            <div id="enfermagemDST" class="tab-pane hidden bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">Enfermagem DST Order Items</h2>
+                <div class="overflow-x-auto">
+                    <table id="enfermagemDSTTable" class="min-w-full table-auto">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="px-4 py-2 text-left">Código SMAR</th>
+                                <th class="px-4 py-2 text-left">Descrição completa</th>
+                                <th class="px-4 py-2 text-left">Unidade de Medida</th>
+                                <th class="px-4 py-2 text-left">Saldo Vivver</th>
+                                <th class="px-4 py-2 text-left">Consumo Médio</th>
+                                <th class="px-4 py-2 text-left">Sugestão de Pedido</th>
+                            </tr>
+                        </thead>
+                        <tbody id="enfermagemDSTTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Enfermagem Urgência e Emergência -->
+            <div id="enfermagemUrgenciaEmergencia" class="tab-pane hidden bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">Enfermagem Urgência e Emergência Order Items</h2>
+                <div class="overflow-x-auto">
+                    <table id="enfermagemUrgenciaEmergenciaTable" class="min-w-full table-auto">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="px-4 py-2 text-left">Código SMAR</th>
+                                <th class="px-4 py-2 text-left">Descrição completa</th>
+                                <th class="px-4 py-2 text-left">Unidade de Medida</th>
+                                <th class="px-4 py-2 text-left">Saldo Vivver</th>
+                                <th class="px-4 py-2 text-left">Consumo Médio</th>
+                                <th class="px-4 py-2 text-left">Sugestão de Pedido</th>
+                            </tr>
+                        </thead>
+                        <tbody id="enfermagemUrgenciaEmergenciaTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Odonto -->
+            <div id="odonto" class="tab-pane hidden bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">Odonto Order Items</h2>
+                <div class="overflow-x-auto">
+                    <table id="odontoTable" class="min-w-full table-auto">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="px-4 py-2 text-left">Código SMAR</th>
+                                <th class="px-4 py-2 text-left">Descrição completa</th>
+                                <th class="px-4 py-2 text-left">Unidade de Medida</th>
+                                <th class="px-4 py-2 text-left">Saldo Vivver</th>
+                                <th class="px-4 py-2 text-left">Consumo Médio</th>
+                                <th class="px-4 py-2 text-left">Sugestão de Pedido</th>
+                            </tr>
+                        </thead>
+                        <tbody id="odontoTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Odonto Instrumental -->
+            <div id="odontoInstrumental" class="tab-pane hidden bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">Odonto Instrumental Order Items</h2>
+                <div class="overflow-x-auto">
+                    <table id="odontoInstrumentalTable" class="min-w-full table-auto">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="px-4 py-2 text-left">Código SMAR</th>
+                                <th class="px-4 py-2 text-left">Descrição completa</th>
+                                <th class="px-4 py-2 text-left">Unidade de Medida</th>
+                                <th class="px-4 py-2 text-left">Saldo Vivver</th>
+                                <th class="px-4 py-2 text-left">Consumo Médio</th>
+                                <th class="px-4 py-2 text-left">Sugestão de Pedido</th>
+                            </tr>
+                        </thead>
+                        <tbody id="odontoInstrumentalTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Consumo e Limpeza Periódico -->
+            <div id="consumoLimpezaPeriodico" class="tab-pane hidden bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">Consumo e Limpeza Periódico Order Items</h2>
+                <div class="overflow-x-auto">
+                    <table id="consumoLimpezaPeriodicoTable" class="min-w-full table-auto">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="px-4 py-2 text-left">Código SMAR</th>
+                                <th class="px-4 py-2 text-left">Descrição completa</th>
+                                <th class="px-4 py-2 text-left">Unidade de Medida</th>
+                                <th class="px-4 py-2 text-left">Saldo Vivver</th>
+                                <th class="px-4 py-2 text-left">Consumo Médio</th>
+                                <th class="px-4 py-2 text-left">Sugestão de Pedido</th>
+                            </tr>
+                        </thead>
+                        <tbody id="consumoLimpezaPeriodicoTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Consumo e Limpeza Esporádico -->
+            <div id="consumoLimpezaEsporadico" class="tab-pane hidden bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">Consumo e Limpeza Esporádico Order Items</h2>
+                <div class="overflow-x-auto">
+                    <table id="consumoLimpezaEsporadicoTable" class="min-w-full table-auto">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="px-4 py-2 text-left">Código SMAR</th>
+                                <th class="px-4 py-2 text-left">Descrição completa</th>
+                                <th class="px-4 py-2 text-left">Unidade de Medida</th>
+                                <th class="px-4 py-2 text-left">Saldo Vivver</th>
+                                <th class="px-4 py-2 text-left">Consumo Médio</th>
+                                <th class="px-4 py-2 text-left">Sugestão de Pedido</th>
+                            </tr>
+                        </thead>
+                        <tbody id="consumoLimpezaEsporadicoTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Impressos e Materiais de Escritório -->
+            <div id="impressosMateriaisEscritorio" class="tab-pane hidden bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">Impressos e Materiais de Escritório Order Items</h2>
+                <div class="overflow-x-auto">
+                    <table id="impressosMateriaisEscritorioTable" class="min-w-full table-auto">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="px-4 py-2 text-left">Código SMAR</th>
+                                <th class="px-4 py-2 text-left">Descrição completa</th>
+                                <th class="px-4 py-2 text-left">Unidade de Medida</th>
+                                <th class="px-4 py-2 text-left">Saldo Vivver</th>
+                                <th class="px-4 py-2 text-left">Consumo Médio</th>
+                                <th class="px-4 py-2 text-left">Sugestão de Pedido</th>
+                            </tr>
+                        </thead>
+                        <tbody id="impressosMateriaisEscritorioTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Botões globais -->
+        <div class="text-center mt-4">
+            <button id="downloadAllOrder" class="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 font-semibold">
+                Baixar pedido completo (HTML)
+            </button>
+        </div>
+
+        <!-- Loading and Status Messages -->
+        <div id="loading" class="hidden text-center mt-4 text-gray-600">Loading...</div>
+        <div id="status" class="hidden text-center mt-4"></div>
+    </div>
+
+    <script>
+    const data = {
+farmacia: [
+  { codigo: "1 01 06 0001 7", descricao: "Aciclovir 200mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 06 002 5", descricao: "Aciclovir 50mg/g creme bisnaga - uso tópico - uso adulto e pediátrico", unidade: "Bisnaga", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0030 0", descricao: "Ácido acético 3% frasco 10ml (manipulado)", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0047 5", descricao: "Ácido acético 5% frasco 10ml (manipulado)", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 03 0001 3", descricao: "Ácido acetilsalicílico 100mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 03 0006 4", descricao: "Ácido acetilsalicílico 500mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 09 0001 0", descricao: "Ácido fólico 5mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0031 9", descricao: "Ácido tricloroacético 80% frasco 10ml (manipulado)", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0163 3", descricao: "Agua destilada ampola 10ml", unidade: "Ampola", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 02 01 0018 1", descricao: "Agulha para aplicação de insulina com caneta 0,23X4MM", unidade: "Unidade", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 05 0014 4", descricao: "Alcatrão Mineral (FN) 10mg/g (1%) pomada", unidade: "Tubo", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 09 12 0605 5", descricao: "ALENDRONATO DE SODIO 70MG COMPRIMIDO - USO ADULTO", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 07 0005 4", descricao: "Albendazol 400mg comprimido mastigável", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 07 0006 2", descricao: "Albendazol 400mg solução oral frasco 10ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 08 0005 9", descricao: "Algestona acetofenida 150mg/ml + estradiol, enantato 10mg/ml ampola 1ml - Uso Im", unidade: "Ampola", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 01 0001 4", descricao: "Alopurinol 100mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 11 0011 5", descricao: "Aminofilina 100mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0009 2", descricao: "Amiodarona, cloridrato 200mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 17 0009 0", descricao: "Amoxicilina 250mg/5ml suspensão frasco 150ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 17 0010 4", descricao: "Amoxicilina 500mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 17 0034 1", descricao: "Amoxicilina 500mg + Clavunalato de potassio125mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 17 0061 9", descricao: "Amoxicilina trihidratada 287mg/5ml - equivalente a 250mg/5ml de amoxicilina + clavulanato de potássio 74,5mg/5ml - equivalente a 62,5mg/5ml de ácido clavulânico pó para suspensão oral frasco 75ml - uso", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 17 0025 2", descricao: "Ampicilina 250mg/5ml suspensão frasco 60ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 17 0024 4", descricao: "Ampicilina 500mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 02 0001 9", descricao: "Anlodipino, besilato 5mg comprimido - uso adulto", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 02 0076 0", descricao: "Atenolol 25mg comprimido - uso adulto", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 17 0029 5", descricao: "Azitromicina dihidratada 524,10mg - equivalente a 500mg azitromicina base comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 17 0051 1", descricao: "Azitromicina dihidratada 209,605mg - equivalente a 200mg de azitromicina base para cada 5ml de suspensão oral reconstituida de 600mg ou 900mg. frasco com pó para reconstituição mais frasco com", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 11 0025 5", descricao: "Beclometasona, dipropionato 200mcg capsula oral", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 11 0003 4", descricao: "Beclometasona, dipropionato 250mcg spray oral frasco 200 doses", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 11 0001 8", descricao: "Beclometasona, dipropionato 50mcg spray nasal frasco 200 doses", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 17 0016 3", descricao: "Benzilpenicilina benzatina 1.200.000 Ui frasco-ampola - Uso Im", unidade: "Ampola", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 17 0017 1", descricao: "Benzilpenicilina benzatina 600.000 Ui frasco-ampola - Uso Im", unidade: "Ampola", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 17 0018 0", descricao: "Benzilpenicilina procaína 300.000 Ui + benzilpenicilina potássica 100.000 Ui frasco-ampola - Uso Im", unidade: "Ampola", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 07 0014 3", descricao: "Benzoato de benzila 250mg/ml solução frasco 100ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 17 0075 9", descricao: "Benzoíla. peróxido 25mg (2,5%) base aquosa - gel", unidade: "Bisnaga", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 12 0050 5", descricao: "Betamesona, acetato de 3mg/ml+betametasona, fosfato dissódico 3,945mg/ml (equivalente a 3mg/ml de betametasona) suspensão injetavel - ampola 1ml - uso adulto e pediátrico acima de 15 anos - uso", unidade: "Ampola", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 18 0007 9", descricao: "Bromoprida 10mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 13 0015 7", descricao: "Budesonida 32mcg/dose frasco 120 doses", unidade: "frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 13 0035 1", descricao: "Budesonida 50mcg/dose suspensão em spray estéril - frasco contendo 120 doses - uso nasal - uso adulto e pediátrico acima de 6 anos.", unidade: "frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0024 6", descricao: "Bultilbrometo de escopolamina 10 mg comprimido +dipirona 250 mg comprimido revestido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0020 3", descricao: "Butilbrometo de escopolamina + dipirona sódica - Uso Im/Iv - ampola 5 ml", unidade: "Ampola", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0010 6", descricao: "Butilbrometo de escopolamina 6,67 mg/ml + dipirona 333,4 ml gotas frasco 20 ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0007 6", descricao: "Butilbrometo de escopolamina 10 mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0019 0", descricao: "Butilbrometo de escopolamina 20 mg/ml - ampola 1 ml", unidade: "Ampola", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0042 4", descricao: "Butilbrometo de escopolamina 10 mg/ml gotas frasco 20 ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 09 12 1028 1", descricao: "CARBONATO DE CALCIO 1250MG (EQUIVALENTE A 500MG DE CALCIO) COMPRIMIDO", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0238 9", descricao: "CARBONATO DE CALCIO 1500MG (EQUIVALENTE A 600MG DE CALCIO)  + colecalciferol 400  UI", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0108 0", descricao: "CARBONATO DE CALCIO 1500MG + colecalciferol 200 UI COMP", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 02 0004 3", descricao: "Captopril 25mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 02 0067 1", descricao: "Carvedilol 12,5mg comprimido - USO ADULTO", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 02 0041 8", descricao: "Carvedilol 6,25mg comprimido - USO ADULTO", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 17 0007 4", descricao: "Cefalexina 250 mg/5 ml suspensão frasco 60 ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 17 0019 8", descricao: "Cefalexina 500 mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 17 0053 8", descricao: "Ceftriaxona sódica hemieptaidratada 1,193g - equivalente a 1g de ceftriaxona base frasco-ampola acompanhado de ampola diluente lidocaina 10mg/ml 3,5ml - uso IM - uso adulto e pediátrico", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 02 06 0025 7", descricao: "Caneta para injeção de insulina Refil - compativel com carpule 3ml (100UI/ml)", unidade: "Caneta", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 05 0006 3", descricao: "Cetoconazol 200 mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 05 0004 7", descricao: "Cetoconazol creme 20 mg/g tubo 30 g", unidade: "Tubo", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 05 0003 9", descricao: "Cetoconazol shampoo 20 mg/g frasco 100 ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 01 0014 6", descricao: "Cetoprofeno 100mg ampola 2ml - uso IM", unidade: "Ampola", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 01 0015 4", descricao: "Cetoprofeno 100mg ampola - uso IV", unidade: "Ampola", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0014 9", descricao: "Cetotifeno, fumarato xarope frasco120 ml - uso adulto e pediátrico", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 10 0004 8", descricao: "Cimetidina 200 mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0011 4", descricao: "Cinarizina 25 mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 17 0037 6", descricao: "Ciprofloxacino, cloridrato monohidratado 582mg - equivalente a 500MG de ciprofloxacino comprimido - USO ADULTO", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 17 0049 0", descricao: "Claritromicina 500mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 17 0031 7", descricao: "Clindamicina, cloridrato 300mg caps", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 02 0005 1", descricao: "Clonidina, cloridrato 0,150mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 02 0007 8", descricao: "Clortalidona 25mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0003 3", descricao: "Cold cream tubo 50G (manipulado)", unidade: "Tubo", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 09 0009 6", descricao: "Complexo B comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 09 0010 0", descricao: "Complexo B amp 2 ml", unidade: "Ampola", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 07 0009 7", descricao: "Deltametrina loção 0,02% frasco 100 ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0035 1", descricao: "Deltametrina shampoo frasco 100 ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 13 0052 1", descricao: "Dexametasona 4mg comprimido - uso adulto e pediátrico", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 13 0007 6", descricao: "Dexametasona, Fosfato Dissódico 4MG/ML - Frasco 2,5 ML", unidade: "Ampola", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0016 5", descricao: "Dexametasona, acetato (Ampola I) + cianocobalamina + tiamina, cloridrato + piridoxina, cloridrato (Ampola II) - Uso Im", unidade: "Ampola", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 13 0011 4", descricao: "Dexametasona, acetato creme dermatológico 1 mg/g tubo 10 g", unidade: "Tubo", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 13 0051 3", descricao: "Dexametasona 1 mg/g suspensão oftalmica esterio frasco 5ml- uso tópico ocular -uso adulto", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 13 0001 7", descricao: "Dexclorfeniramina, maleato 2 mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 13 0004 1", descricao: "Dexclorfeniramina, maleato 2 mg/5 ml suspensão frasco 100 ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 02001", descricao: "Dextrano 70 1mg/ml + Hipromelose 3mg/ml frasco 15 ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 01 0005 7", descricao: "Diclofenaco de sódio 75mg ampola 3ml", unidade: "Ampola", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 01 0008 1", descricao: "Diclofenaco sódico 50mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0022 0", descricao: "Digoxina 0,25 mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 18 0006 0", descricao: "Dimenidrinato + piridoxina, 50/10mg cloridrato comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 18 0009 5", descricao: "Dimenidrinato + piridoxina, cloridrato + glicose + frutose ampola 10 ml - Uso Ev", unidade: "Ampola", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0028 9", descricao: "Dimenidrinato + piridoxina, cloridrato ampola 1 ml - Uso Im", unidade: "Ampola", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 18 0003 6", descricao: "Dimenidrinato + piridoxina, cloridrato gotas frasco 20 ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 03 0009 9", descricao: "Dipirona sódica 500 mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 03 0005 6", descricao: "Dipirona sódica 500 mg/ml ampola 2 ml", unidade: "Ampola", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 03 0004 8", descricao: "Dipirona sódica 500 mg/ml gotas frasco 10 ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 18 0002 8", descricao: "Domperidona suspensão 1 mg/ml frasco 100 ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0170 6", descricao: "Doxazosina, mesilato 2MG comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 02 0009 4", descricao: "Enalapril, maleato 10mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 02 0010 8", descricao: "Enalapril, maleato 20mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 02 0008 6", descricao: "Enalapril, maleato 5mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 17 0064 3", descricao: "Eritromicina, estolato 250 mg/ 5 ml suspensão frasco 100ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 17 0073 2", descricao: "Eritromicina, estolato 250 mg/ 5 ml suspensão oral frasco 60ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 02 0011 6", descricao: "Espironolactona 25mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 08 0022 9", descricao: "Estriol 1mg/g creme vaginal bisnaga 50+aplicador - uso intravaginal - uso adulto", unidade: "Tubo", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 08 0019 9", descricao: "Estrogênios conjugados 0,3mg - drágeas - uso oral p/adultos", unidade: "Drágeas", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0076 9", descricao: "Finasterida 5MG comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 02 14 0007 3", descricao: "Fitas para hemoglicoteste - ( hgt )", unidade: "Unidade", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 02 0018 3", descricao: "Furosemida 10 mg/ml ampola 2 ml", unidade: "Ampola", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 02 0014 0", descricao: "Furosemida 40 mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 05 0001 2", descricao: "Fluconazol 150mg cápsula - uso adulto.", unidade: "Cápsula", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 12 0001 2", descricao: "Glibenclamida 5 mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0442 0", descricao: "Glicerol 2,68G supositório - uso retal - uso adulto", unidade: "Unidade", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 12 0052 7", descricao: "Gliclazida 60 mg comprimido (liberação modificada)", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0017 3", descricao: "Glicose 25% ampola 10 ml", unidade: "Ampola", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0018 1", descricao: "Glicose 50% ampola 10 ml", unidade: "Ampola", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0039 4", descricao: "Heparina Sódica 5.000ui/0,25ml AMP 0,25ml USO SC", unidade: "Ampola", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 02 0050 7", descricao: "Hidralazina, cloridrato 25mg drágea - uso adulto", unidade: "Drágeas", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 02 0006 0", descricao: "Hidroclorotiazida 25mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0029 7", descricao: "Hidrocortisona, acetato 11,2mg (equivalente a 10mg de hidrocortisona) creme - bisnaga de 20mg - uso dermatológico - uso adulto e pediátrico.", unidade: "Tubo", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0029 7", descricao: "Hidrocortisona + neomicina, sulfato + polimixina b, sulfato  gotas frasco 10 ml (tipo otosporin)", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 13 0009 2", descricao: "Hidrocortisona, succinato 500 mg frasco", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 10 0003 0", descricao: "Hidróxido de alumínio 60 mg/ml suspensão frasco 150 ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0006 8", descricao: "Hidróxido de magnésio 80 mg/ml suspensão frasco 120 ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0040 8", descricao: "Hidróxido de potássio 10% frasco 10 ml (manipulado)", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 01 0012 0", descricao: "Ibuprofeno 300mg comprimido - uso adulto", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 01 0006 5", descricao: "Ibuprofeno 50mg/ml gotas frasco 30ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 12 0005 5", descricao: "Insulina humana nph 100 ui/ml frasco 10 ml - uso adulto e pediátrico", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 12 0057 8", descricao: "Insulina humana NPH 100UI/ML Caneta descartável 3ML - uso adulto e pediátrico", unidade: "Caneta", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 12 0006 3", descricao: "Insulina humana regular 100 ui/ml frasco 10 ml - uso adulto e pediátrico", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 12 0056 0", descricao: "Insulina humana regular 100UI/ML Caneta descartável 3ML uso adulto e pediátrico", unidade: "Caneta", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 12 0035 7", descricao: "Insulina humana NPH 100 ui/ml refil 3 ml - uso adulto e pediátrico", unidade: "Refil", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 12 0034 9", descricao: "Insulina humana regular 100 ui/ml refil 3 ml - uso adulto e pediátrico", unidade: "Refil", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 11 0007 7", descricao: "Ipratrópio, brometo gotas frasco 20 ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0107 2", descricao: "Isossorbida, mononitrato 20mg comprimido - uso adulto", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 02 0016 7", descricao: "Isossorbida, dinitrato 10 mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 02 0015 9", descricao: "Isossorbida, dinitrato 5 mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 02 09 0025 0", descricao: "Lanceta para hgt", unidade: "Unidade", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0145 5", descricao: "Lactulose 1340,00mg/ml - equivalente a 667mg/ml de lactulos frasco 120 ml - uso adulto e pediátrico.", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 09 20 0121 0", descricao: "LEVODOPA 100MG + BENSERAZIDA, CLORIDRATO 25MG COMPRIMIDO BIRRANHURADO - USO ADULTO", unidade: "Unidade", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 09 12 1672 7", descricao: "LEVODOPA 100MG + BENSERAZIDA, CLORIDRATO 25MG  CAPSULA HBS - USO ADULTO", unidade: "Unidade", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 09 12 1561 5", descricao: "LEVODOPA 200MG + BENSERAZIDA, CLORIDRATO 50MG  COMPRIMIDO - USO ADULTO", unidade: "Unidade", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 09 12 1637 9", descricao: "LEVODOPA 250MG + CARBIDOPA 25MG COMPRIMIDO - USO ADULTO", unidade: "Unidade", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 08 0006 7", descricao: "Levonorgestrel 0,75 mg cartela 2 comp", unidade: "Cartela", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 08 0002 4", descricao: "Levonorgestrel+ etinilestradiol cartela 21 comp", unidade: "Cartela", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 19 0011 1", descricao: "Levotiroxina sódica 100mcg comprimido - uso adulto e pediátrico", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 19 0007 3", descricao: "Levotiroxina sódica 25mcg comprimido - uso adulto e pediátrico", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 19 0008 1", descricao: "Levotiroxina sódica 50mcg comprimido - uso adulto e pediátrico", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 09 12 2643 9", descricao: "Levotiroxina sódica 37,5mcg comprimido - uso adulto e pediátrico", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 19 0016 2", descricao: "Levotiroxina sódica 12,5mcg comprimido - uso adulto e pediátrico", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0005 0", descricao: "Lidocaína gel 100 mg/5 g tubo 30 g", unidade: "Tubo", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 13 0014 9", descricao: "Loratadina 1 mg/ml suspensão oral frasco 100 ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 13 0008 4", descricao: "Loratadina 10 mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 02 0003 5", descricao: "Losartana potássica 50mg comprimido revestido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 07 0002 0", descricao: "Mebendazol 100 mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 07 0003 8", descricao: "Mebendazol suspensão 100 mg/5 ml frasco 30 ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 08 0001 6", descricao: "Medroxiprogesterona, acetato 150 mg/ml ampola 1 ml - Uso Im", unidade: "Ampola", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 08 0024 5", descricao: "MEDROXIPROGESTERONA, ACETATO 25MG/ML + ESTRADIOL, CIPIONATO 5MG/ML SUSPENSAO INJETAVEL 0,5ML", unidade: "Ampola", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 12 0002 0", descricao: "Metformina, cloridrato 500 mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 12 0003 9", descricao: "Metformina, cloridrato 850 mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 02 0017 5", descricao: "Metildopa 250 mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 18 0010 9", descricao: "Metoclopramida, cloridrato 10 mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 18 0005 2", descricao: "Metoclopramida, cloridrato 5 mg/ml ampola 2 ml", unidade: "Ampola", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 18 0011 7", descricao: "Metoclopramida, cloridrato gotas frasco 10 ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0175 7", descricao: "Metoprolol, succinato 47,5mg - equivalente a 50MG de Metoprolol, tartarato - uso adulto", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 17 0003 1", descricao: "Metronidazol 250 mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 17 0005 8", descricao: "Metronidazol 40 mg/ml suspensão oral frasco 100 ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 17 0008 2", descricao: "Metronidazol 500 mg/5 g tubo 50 g c/ 10 aplicadores", unidade: "Tubo", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 17 0006 6", descricao: "Neomicina, sulfato + bacitracina zínica tubo 10 g", unidade: "Tubo", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 02 0019 1", descricao: "Nifedipina 20 mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 01 0003 0", descricao: "Nimesulida 100mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 01 0004 9", descricao: "Nimesulida 50mg/ml frasco 15ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 05 0002 0", descricao: "Nistatina 100.000 Ui/4 g creme vaginal tubo 60 g", unidade: "Tubo", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 07 0004 6", descricao: "Nistatina 100.000 Ui/ml suspensão oral frasco 50 ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 17 0040 6", descricao: "Nitrofurantoina 100mg cápsula", unidade: "Cápsula", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 08 0003 2", descricao: "Noretisterona 0,35 mg cartela 35 comp", unidade: "Cartela", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 08 0004 0", descricao: "Noretisterona, enantato + estradiol, valerato (50 + 5 mg/ml) ampola 1 ml - Uso Im", unidade: "Ampola", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 17 0011 2", descricao: "Norfloxacina 400 mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0004 1", descricao: "Óleo mineral 100% frasco 100 ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 10 0002 1", descricao: "Omeprazol 20 mg cápsula", unidade: "Cápsula", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 18 0013 3", descricao: "Ondansetrona 8mg - equivalente a 10mg de ondansentrona, cloridrato comprimido de desintegração oral - uso adulto e pediátrico acima de 11 anos.", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 03 0003 0", descricao: "Paracetamol 200 mg/ml gotas frasco15 ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 03 0013 7", descricao: "Paracetamol 500mg comprimido - uso adulto e pediátrico acima de 12 anos.", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0443 8", descricao: "Pasta D'água óxido de zinco 25% (250mg/g) bisnaga 80g - uso externo - uso adulto e pediátrico", unidade: "Bisnaga", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0012 2", descricao: "Permanganato de potássio 100 mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 09 12 2645 5", descricao: "Permetrina 50mg/ml loção cremosa frasco plastico", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 09 0044 4", descricao: "Polivitamínico gotas frasco 20 ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 13 0006 8", descricao: "Prednisolona, fosfato sódico 3 mg/ml suspensão frasco 100 ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 13 0003 3", descricao: "Prednisona 20 mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 13 0002 5", descricao: "Prednisona 5 mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 13 0005 0", descricao: "Prometazina, cloridrato 25 mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 13 0013 0", descricao: "Prometazina, cloridrato 25 mg/ml ampola 2 ml", unidade: "Ampola", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0119 6", descricao: "Proprafenona , cloridrato 300mg comprimido revestido - uso adulto", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 02 0013 2", descricao: "Propranolol, cloridrato 40 mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0025 4", descricao: "Sais para reidratação oral envelope 27,9 g", unidade: "Envelope", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 11 0004 2", descricao: "Salbutamol 2 mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 11 0026 3", descricao: "Salbutamol Sulfato 6MG-frasco 10ML- solução para nebulização", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 11 0009 3", descricao: "Salbutamol, sulfato 2 mg/5 ml xarope frasco 120 ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 11 0010 7", descricao: "Salbutamol, sulfato spray oral 100 mcg/dose 200 doses", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 18 0001 0", descricao: "Simeticona 75 mg/ml gotas frasco 15 ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0371 7", descricao: "Sinvastatina 20MG comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 09 12 2647 1", descricao: "Sulfadiazina de prata 1% (10mg/g) creme", unidade: "Tubo", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 17 0004 0", descricao: "Sulfametoxazol - trimetoprim 200/40 mg/5 ml suspensão frasco 100 ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 17 0020 1", descricao: "Sulfametoxazol - trimetoprim 400/80 mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 09 0008 8", descricao: "Sulfato ferroso 25 mg/ml gotas frasco 30 ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 09 0006 1", descricao: "Sulfato ferroso 300 mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 09 0007 0", descricao: "Sulfato ferroso 40 mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 19 0002 2", descricao: "Tiamazol 10 mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 09 0011 8", descricao: "Tiamina, cloridrato 300 mg comprimido", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0281 8", descricao: "Tiamina, cloridrato + piridoxina, cloridrato (Ampola I),  Cianocobalamina 5000 mcg (Ampola II) - Uso IM", unidade: "Ampola", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 20 0015 7", descricao: "Tiocolchicosídeo 2 mg/ml ampola 2 ml - Uso Im", unidade: "Ampola", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 17 0022 8", descricao: "Tobramicina 0,3% colírio frasco 5 ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 12 0004 7", descricao: "Vildagliptina 50 mg comprimido (Reposição automática mediante consumo)", unidade: "Comprimido", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 09 0045 2", descricao: "Vitamina a + d gotas frasco 20 ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 09 0004 5", descricao: "Vitamina a + d pomada tubo 45 g", unidade: "Tubo", saldo: 0, consumo: 0, sugestao: 0 },
+  { codigo: "1 01 09 0005 3", descricao: "Vitamina c 200 mg/ml gotas frasco 20 ml", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 }
+        ],
+        psicotropicos: [],
+        enfermagem: [
+            { codigo: "1 02 12 0001 5", descricao: "Abaixador de lingua de madeira (Pacote c/ 100 unidades)", unidade: "Pacote", saldo: 0, consumo: 0, sugestao: 0 },
+            { codigo: "1 02 03 0001 6", descricao: "Ácido graxo essencial (Age)", unidade: "Frasco", saldo: 6, consumo: 3, sugestao: -3 },
+            { codigo: "1 02 01 0004 1", descricao: "Agulha descartável hipodérmica 25 x 7 mm", unidade: "Unidade", saldo: 200, consumo: 157, sugestao: -43 },
+            { codigo: "1 02 11 0005 3", descricao: "Álcool 70º (Antisséptico e bactericida)", unidade: "Litro", saldo: 0, consumo: 0, sugestao: 0 }
+        ],
+        enfermagemDST: [],
+        enfermagemUrgenciaEmergencia: [],
+        odonto: [
+            { codigo: "1 07 01 0001 0", descricao: "Ácido condicionador para resina foto", unidade: "Frasco", saldo: 0, consumo: 0, sugestao: 0 },
+            { codigo: "1 07 01 0002 9", descricao: "Agulha curta para anestesia", unidade: "Caixa", saldo: 0, consumo: 0, sugestao: 0 },
+            { codigo: "1 07 01 0086 0", descricao: "Máscara cirúrgica descartável", unidade: "Unidade", saldo: 0, consumo: 0, sugestao: 0 },
+            { codigo: "1 07 01 0093 2", descricao: "Óxido zinco pó", unidade: "Unidade", saldo: 0, consumo: 0, sugestao: 0 }
+        ],
+        odontoInstrumental: [],
+        consumoLimpezaPeriodico: [],
+        consumoLimpezaEsporadico: [],
+        impressosMateriaisEscritorio: []
+    };
+
+    function renderTable(tab, items) {
+        const tableBody = document.getElementById(`${tab}TableBody`);
+        if (!tableBody) return;
+
+        tableBody.innerHTML = '';
+        items.forEach(item => {
+            let colorClass = '';
+            if (item.sugestao < 0) colorClass = 'bg-red-100 text-red-700 font-bold';
+            else if (item.sugestao > 0) colorClass = 'bg-green-100 text-green-700 font-bold';
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="border px-4 py-2" data-codigo="${item.codigo}">${item.codigo}</td>
+                <td class="border px-4 py-2">${item.descricao}</td>
+                <td class="border px-4 py-2">${item.unidade}</td>
+                <td class="border px-4 py-2">
+                    <input type="number" value="${item.saldo}" class="w-full p-1 border rounded" data-codigo="${item.codigo}" data-field="saldo" />
+                </td>
+                <td class="border px-4 py-2">
+                    <input type="number" value="${item.consumo}" class="w-full p-1 border rounded" data-codigo="${item.codigo}" data-field="consumo" />
+                </td>
+                <td class="border px-4 py-2">
+                    <input type="number" value="${item.sugestao}" class="w-full p-1 border rounded ${colorClass}" data-codigo="${item.codigo}" data-field="sugestao" readonly />
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
+
+        // Add event listeners to inputs for auto recalculation
+        document.querySelectorAll(`#${tab}TableBody input[data-field="saldo"], #${tab}TableBody input[data-field="consumo"]`).forEach(input => {
+            input.addEventListener('input', () => {
+                const row = input.closest('tr');
+                const saldoInput = row.querySelector('input[data-field="saldo"]');
+                const consumoInput = row.querySelector('input[data-field="consumo"]');
+                const sugestaoInput = row.querySelector('input[data-field="sugestao"]');
+                const saldo = parseInt(saldoInput.value) || 0;
+                const consumo = parseInt(consumoInput.value) || 0;
+                const sugestao = consumo - saldo;
+                sugestaoInput.value = sugestao;
+
+                sugestaoInput.classList.remove('bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700', 'font-bold');
+
+                if (sugestao < 0) {
+                    sugestaoInput.classList.add('bg-red-100', 'text-red-700', 'font-bold');
+                } else if (sugestao > 0) {
+                    sugestaoInput.classList.add('bg-green-100', 'text-green-700', 'font-bold');
+                }
+            });
+        });
+    }
+
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.add('hidden'));
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.classList.remove('bg-white', 'border-t', 'border-l', 'border-r', 'rounded-t');
+            button.classList.add('bg-gray-200');
+        });
+        const tabContent = document.getElementById(tabName);
+        if (tabContent) tabContent.classList.remove('hidden');
+        const activeButton = document.querySelector(`button[data-tab="${tabName}"]`);
+        if (activeButton) {
+            activeButton.classList.add('bg-white', 'border-t', 'border-l', 'border-r', 'rounded-t');
+            activeButton.classList.remove('bg-gray-200');
+        }
+    }
+
+    function capitalizeFirstLetter(string) {
+        if (!string) return string;
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
+    function initGoogleSheets() {
+        gapi.load('client:auth2', () => {
+            gapi.client.init({
+                apiKey: 'YOUR_API_KEY', // substitua aqui
+                clientId: 'YOUR_CLIENT_ID', // substitua aqui
+                scope: 'https://www.googleapis.com/auth/spreadsheets',
+                discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4']
+            }).then(() => {
+                console.log('Google API initialized');
+            }).catch(err => console.error('Error initializing Google API:', err));
+        });
+    }
+
+    async function submitAllOrders() {
+        const responsible = document.getElementById('responsible').value || '(não informado)';
+        const requestingUnit = document.getElementById('requestingUnit').value || '(não informado)';
+        const period = document.getElementById('period').value || '(não informado)';
+
+        const allData = [];
+
+        // Para cada aba (setor), coleta as linhas da tabela
+        for (const [tabKey, items] of Object.entries(data)) {
+            const tableBody = document.getElementById(`${tabKey}TableBody`);
+            if (!tableBody) continue;
+            const rows = tableBody.querySelectorAll('tr');
+            if (!rows.length) continue; 
+
+            // Cabeçalho da seção para o setor
+            allData.push([capitalizeFirstLetter(tabKey)]);
+            allData.push(['Responsável:', responsible]);
+            allData.push(['Unidade Solicitante:', requestingUnit]);
+            allData.push(['Período:', period]);
+            allData.push(['Código SMAR', 'Descrição completa', 'Unidade de Medida', 'Saldo Vivver', 'Consumo Médio', 'Sugestão de Pedido']);
+
+            rows.forEach(row => {
+                const codigo = row.cells[0].textContent.trim();
+                const descricao = row.cells[1].textContent.trim();
+                const unidade = row.cells[2].textContent.trim();
+
+                const saldo = row.querySelector('input[data-field="saldo"]').value || 0;
+                const consumo = row.querySelector('input[data-field="consumo"]').value || 0;
+                const sugestao = row.querySelector('input[data-field="sugestao"]').value || 0;
+
+                allData.push([codigo, descricao, unidade, saldo, consumo, sugestao]);
+            });
+
+            // Linha em branco separando os setores
+            allData.push(['', '', '', '', '', '']);
+        }
+
+        if (allData.length === 0) {
+            alert('Nenhum dado para enviar.');
+            return;
+        }
+
+        try {
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('status').classList.add('hidden');
+
+            await gapi.client.sheets.spreadsheets.values.append({
+                spreadsheetId: 'YOUR_SPREADSHEET_ID',  // substitua aqui
+                range: `PedidoCompleto!A1`, // nome da aba onde será inserido o pedido completo
+                valueInputOption: 'RAW',
+                insertDataOption: 'INSERT_ROWS',
+                resource: { values: allData }
+            });
+
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('status').classList.remove('hidden');
+            document.getElementById('status').innerText = `Pedido completo enviado com sucesso!`;
+            document.getElementById('status').classList.remove('text-red-600');
+            document.getElementById('status').classList.add('text-green-600');
+        } catch (err) {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('status').classList.remove('hidden');
+            document.getElementById('status').innerText = `Erro ao enviar pedido completo: ${err.message}`;
+            document.getElementById('status').classList.remove('text-green-600');
+            document.getElementById('status').classList.add('text-red-600');
+            console.error('Erro ao enviar pedido completo para Google Sheets:', err);
+        }
+    }
+
+    // Função que gera o conteúdo HTML do pedido completo atual para download
+    function gerarHtmlDoPedidoCompleto() {
+        const responsible = document.getElementById('responsible').value || '(não informado)';
+        const requestingUnit = document.getElementById('requestingUnit').value || '(não informado)';
+        const period = document.getElementById('period').value || '(não informado)';
+        const setores = Object.keys(data);
+
+        let htmlTables = '';
+
+        setores.forEach(tabKey => {
+            const tableBody = document.getElementById(`${tabKey}TableBody`);
+            if (!tableBody) return;
+
+            const rows = tableBody.querySelectorAll('tr');
+            if (rows.length === 0) return;
+
+            // Título e informações do setor
+            htmlTables += `<h2 style="background-color:#f0f0f0; padding:10px;">${capitalizeFirstLetter(tabKey)}</h2>`;
+            htmlTables += `<p><strong>Responsável:</strong> ${responsible}</p>`;
+            htmlTables += `<p><strong>Unidade Solicitante:</strong> ${requestingUnit}</p>`;
+            htmlTables += `<p><strong>Período:</strong> ${period}</p>`;
+
+            // Começa a tabela
+            htmlTables += `<table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse; width: 100%; margin-bottom: 20px;">`;
+            htmlTables += `<thead><tr>
+                <th>Código SMAR</th>
+                <th>Descrição completa</th>
+                <th>Unidade de Medida</th>
+                <th>Saldo Vivver</th>
+                <th>Consumo Médio</th>
+                <th>Sugestão de Pedido</th>
+            </tr></thead><tbody>`;
+
+            rows.forEach(row => {
+                const codigo = row.cells[0].textContent.trim();
+                const descricao = row.cells[1].textContent.trim();
+                const unidade = row.cells[2].textContent.trim();
+                const saldo = row.querySelector('input[data-field="saldo"]').value || '0';
+                const consumo = row.querySelector('input[data-field="consumo"]').value || '0';
+                const sugestao = row.querySelector('input[data-field="sugestao"]').value || '0';
+
+                htmlTables += `<tr>
+                    <td>${codigo}</td>
+                    <td>${descricao}</td>
+                    <td>${unidade}</td>
+                    <td>${saldo}</td>
+                    <td>${consumo}</td>
+                    <td>${sugestao}</td>
+                </tr>`;
+            });
+
+            htmlTables += '</tbody></table>';
+        });
+
+        // Monta o HTML completo para download
+        const htmlCompleto = `
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
     <title>Pedido Completo - Download</title>
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; }
@@ -13,1567 +753,46 @@
 </head>
 <body>
     <h1>Pedido Completo</h1>
-    <h2 style="background-color:#f0f0f0; padding:10px;">Farmacia</h2><p><strong>Responsável:</strong> (não informado)</p><p><strong>Unidade Solicitante:</strong> (não informado)</p><p><strong>Período:</strong> (não informado)</p><table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse; width: 100%; margin-bottom: 20px;"><thead><tr>
-                <th>Código SMAR</th>
-                <th>Descrição completa</th>
-                <th>Unidade de Medida</th>
-                <th>Saldo Vivver</th>
-                <th>Consumo Médio</th>
-                <th>Sugestão de Pedido</th>
-            </tr></thead><tbody><tr>
-                    <td>1 01 06 0001 7</td>
-                    <td>Aciclovir 200mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>500</td>
-                    <td>600</td>
-                    <td>100</td>
-                </tr><tr>
-                    <td>1 01 06 002 5</td>
-                    <td>Aciclovir 50mg/g creme bisnaga - uso tópico - uso adulto e pediátrico</td>
-                    <td>Bisnaga</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0030 0</td>
-                    <td>Ácido acético 3% frasco 10ml (manipulado)</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0047 5</td>
-                    <td>Ácido acético 5% frasco 10ml (manipulado)</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 03 0001 3</td>
-                    <td>Ácido acetilsalicílico 100mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 03 0006 4</td>
-                    <td>Ácido acetilsalicílico 500mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 09 0001 0</td>
-                    <td>Ácido fólico 5mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0031 9</td>
-                    <td>Ácido tricloroacético 80% frasco 10ml (manipulado)</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0163 3</td>
-                    <td>Agua destilada ampola 10ml</td>
-                    <td>Ampola</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 02 01 0018 1</td>
-                    <td>Agulha para aplicação de insulina com caneta 0,23X4MM</td>
-                    <td>Unidade</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 05 0014 4</td>
-                    <td>Alcatrão Mineral (FN) 10mg/g (1%) pomada</td>
-                    <td>Tubo</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 09 12 0605 5</td>
-                    <td>ALENDRONATO DE SODIO 70MG COMPRIMIDO - USO ADULTO</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 07 0005 4</td>
-                    <td>Albendazol 400mg comprimido mastigável</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 07 0006 2</td>
-                    <td>Albendazol 400mg solução oral frasco 10ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 08 0005 9</td>
-                    <td>Algestona acetofenida 150mg/ml + estradiol, enantato 10mg/ml ampola 1ml - Uso Im</td>
-                    <td>Ampola</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 01 0001 4</td>
-                    <td>Alopurinol 100mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 11 0011 5</td>
-                    <td>Aminofilina 100mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0009 2</td>
-                    <td>Amiodarona, cloridrato 200mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 17 0009 0</td>
-                    <td>Amoxicilina 250mg/5ml suspensão frasco 150ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 17 0010 4</td>
-                    <td>Amoxicilina 500mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 17 0034 1</td>
-                    <td>Amoxicilina 500mg + Clavunalato de potassio125mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 17 0061 9</td>
-                    <td>Amoxicilina trihidratada 287mg/5ml - equivalente a 250mg/5ml de amoxicilina + clavulanato de potássio 74,5mg/5ml - equivalente a 62,5mg/5ml de ácido clavulânico pó para suspensão oral frasco 75ml - uso</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 17 0025 2</td>
-                    <td>Ampicilina 250mg/5ml suspensão frasco 60ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 17 0024 4</td>
-                    <td>Ampicilina 500mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 02 0001 9</td>
-                    <td>Anlodipino, besilato 5mg comprimido - uso adulto</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 02 0076 0</td>
-                    <td>Atenolol 25mg comprimido - uso adulto</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 17 0029 5</td>
-                    <td>Azitromicina dihidratada 524,10mg - equivalente a 500mg azitromicina base comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 17 0051 1</td>
-                    <td>Azitromicina dihidratada 209,605mg - equivalente a 200mg de azitromicina base para cada 5ml de suspensão oral reconstituida de 600mg ou 900mg. frasco com pó para reconstituição mais frasco com</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 11 0025 5</td>
-                    <td>Beclometasona, dipropionato 200mcg capsula oral</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 11 0003 4</td>
-                    <td>Beclometasona, dipropionato 250mcg spray oral frasco 200 doses</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 11 0001 8</td>
-                    <td>Beclometasona, dipropionato 50mcg spray nasal frasco 200 doses</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 17 0016 3</td>
-                    <td>Benzilpenicilina benzatina 1.200.000 Ui frasco-ampola - Uso Im</td>
-                    <td>Ampola</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 17 0017 1</td>
-                    <td>Benzilpenicilina benzatina 600.000 Ui frasco-ampola - Uso Im</td>
-                    <td>Ampola</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 17 0018 0</td>
-                    <td>Benzilpenicilina procaína 300.000 Ui + benzilpenicilina potássica 100.000 Ui frasco-ampola - Uso Im</td>
-                    <td>Ampola</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 07 0014 3</td>
-                    <td>Benzoato de benzila 250mg/ml solução frasco 100ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 17 0075 9</td>
-                    <td>Benzoíla. peróxido 25mg (2,5%) base aquosa - gel</td>
-                    <td>Bisnaga</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 12 0050 5</td>
-                    <td>Betamesona, acetato de 3mg/ml+betametasona, fosfato dissódico 3,945mg/ml (equivalente a 3mg/ml de betametasona) suspensão injetavel - ampola 1ml - uso adulto e pediátrico acima de 15 anos - uso</td>
-                    <td>Ampola</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 18 0007 9</td>
-                    <td>Bromoprida 10mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 13 0015 7</td>
-                    <td>Budesonida 32mcg/dose frasco 120 doses</td>
-                    <td>frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 13 0035 1</td>
-                    <td>Budesonida 50mcg/dose suspensão em spray estéril - frasco contendo 120 doses - uso nasal - uso adulto e pediátrico acima de 6 anos.</td>
-                    <td>frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0024 6</td>
-                    <td>Bultilbrometo de escopolamina 10 mg comprimido +dipirona 250 mg comprimido revestido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0020 3</td>
-                    <td>Butilbrometo de escopolamina + dipirona sódica - Uso Im/Iv - ampola 5 ml</td>
-                    <td>Ampola</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0010 6</td>
-                    <td>Butilbrometo de escopolamina 6,67 mg/ml + dipirona 333,4 ml gotas frasco 20 ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0007 6</td>
-                    <td>Butilbrometo de escopolamina 10 mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0019 0</td>
-                    <td>Butilbrometo de escopolamina 20 mg/ml - ampola 1 ml</td>
-                    <td>Ampola</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0042 4</td>
-                    <td>Butilbrometo de escopolamina 10 mg/ml gotas frasco 20 ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 09 12 1028 1</td>
-                    <td>CARBONATO DE CALCIO 1250MG (EQUIVALENTE A 500MG DE CALCIO) COMPRIMIDO</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0238 9</td>
-                    <td>CARBONATO DE CALCIO 1500MG (EQUIVALENTE A 600MG DE CALCIO)  + colecalciferol 400  UI</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0108 0</td>
-                    <td>CARBONATO DE CALCIO 1500MG + colecalciferol 200 UI COMP</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 02 0004 3</td>
-                    <td>Captopril 25mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 02 0067 1</td>
-                    <td>Carvedilol 12,5mg comprimido - USO ADULTO</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 02 0041 8</td>
-                    <td>Carvedilol 6,25mg comprimido - USO ADULTO</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 17 0007 4</td>
-                    <td>Cefalexina 250 mg/5 ml suspensão frasco 60 ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 17 0019 8</td>
-                    <td>Cefalexina 500 mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 17 0053 8</td>
-                    <td>Ceftriaxona sódica hemieptaidratada 1,193g - equivalente a 1g de ceftriaxona base frasco-ampola acompanhado de ampola diluente lidocaina 10mg/ml 3,5ml - uso IM - uso adulto e pediátrico</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 02 06 0025 7</td>
-                    <td>Caneta para injeção de insulina Refil - compativel com carpule 3ml (100UI/ml)</td>
-                    <td>Caneta</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 05 0006 3</td>
-                    <td>Cetoconazol 200 mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 05 0004 7</td>
-                    <td>Cetoconazol creme 20 mg/g tubo 30 g</td>
-                    <td>Tubo</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 05 0003 9</td>
-                    <td>Cetoconazol shampoo 20 mg/g frasco 100 ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 01 0014 6</td>
-                    <td>Cetoprofeno 100mg ampola 2ml - uso IM</td>
-                    <td>Ampola</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 01 0015 4</td>
-                    <td>Cetoprofeno 100mg ampola - uso IV</td>
-                    <td>Ampola</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0014 9</td>
-                    <td>Cetotifeno, fumarato xarope frasco120 ml - uso adulto e pediátrico</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 10 0004 8</td>
-                    <td>Cimetidina 200 mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0011 4</td>
-                    <td>Cinarizina 25 mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 17 0037 6</td>
-                    <td>Ciprofloxacino, cloridrato monohidratado 582mg - equivalente a 500MG de ciprofloxacino comprimido - USO ADULTO</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 17 0049 0</td>
-                    <td>Claritromicina 500mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 17 0031 7</td>
-                    <td>Clindamicina, cloridrato 300mg caps</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 02 0005 1</td>
-                    <td>Clonidina, cloridrato 0,150mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 02 0007 8</td>
-                    <td>Clortalidona 25mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0003 3</td>
-                    <td>Cold cream tubo 50G (manipulado)</td>
-                    <td>Tubo</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 09 0009 6</td>
-                    <td>Complexo B comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 09 0010 0</td>
-                    <td>Complexo B amp 2 ml</td>
-                    <td>Ampola</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 07 0009 7</td>
-                    <td>Deltametrina loção 0,02% frasco 100 ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0035 1</td>
-                    <td>Deltametrina shampoo frasco 100 ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 13 0052 1</td>
-                    <td>Dexametasona 4mg comprimido - uso adulto e pediátrico</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 13 0007 6</td>
-                    <td>Dexametasona, Fosfato Dissódico 4MG/ML - Frasco 2,5 ML</td>
-                    <td>Ampola</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0016 5</td>
-                    <td>Dexametasona, acetato (Ampola I) + cianocobalamina + tiamina, cloridrato + piridoxina, cloridrato (Ampola II) - Uso Im</td>
-                    <td>Ampola</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 13 0011 4</td>
-                    <td>Dexametasona, acetato creme dermatológico 1 mg/g tubo 10 g</td>
-                    <td>Tubo</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 13 0051 3</td>
-                    <td>Dexametasona 1 mg/g suspensão oftalmica esterio frasco 5ml- uso tópico ocular -uso adulto</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 13 0001 7</td>
-                    <td>Dexclorfeniramina, maleato 2 mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 13 0004 1</td>
-                    <td>Dexclorfeniramina, maleato 2 mg/5 ml suspensão frasco 100 ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 02001</td>
-                    <td>Dextrano 70 1mg/ml + Hipromelose 3mg/ml frasco 15 ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 01 0005 7</td>
-                    <td>Diclofenaco de sódio 75mg ampola 3ml</td>
-                    <td>Ampola</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 01 0008 1</td>
-                    <td>Diclofenaco sódico 50mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0022 0</td>
-                    <td>Digoxina 0,25 mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 18 0006 0</td>
-                    <td>Dimenidrinato + piridoxina, 50/10mg cloridrato comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 18 0009 5</td>
-                    <td>Dimenidrinato + piridoxina, cloridrato + glicose + frutose ampola 10 ml - Uso Ev</td>
-                    <td>Ampola</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0028 9</td>
-                    <td>Dimenidrinato + piridoxina, cloridrato ampola 1 ml - Uso Im</td>
-                    <td>Ampola</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 18 0003 6</td>
-                    <td>Dimenidrinato + piridoxina, cloridrato gotas frasco 20 ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 03 0009 9</td>
-                    <td>Dipirona sódica 500 mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 03 0005 6</td>
-                    <td>Dipirona sódica 500 mg/ml ampola 2 ml</td>
-                    <td>Ampola</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 03 0004 8</td>
-                    <td>Dipirona sódica 500 mg/ml gotas frasco 10 ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 18 0002 8</td>
-                    <td>Domperidona suspensão 1 mg/ml frasco 100 ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0170 6</td>
-                    <td>Doxazosina, mesilato 2MG comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 02 0009 4</td>
-                    <td>Enalapril, maleato 10mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 02 0010 8</td>
-                    <td>Enalapril, maleato 20mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 02 0008 6</td>
-                    <td>Enalapril, maleato 5mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 17 0064 3</td>
-                    <td>Eritromicina, estolato 250 mg/ 5 ml suspensão frasco 100ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 17 0073 2</td>
-                    <td>Eritromicina, estolato 250 mg/ 5 ml suspensão oral frasco 60ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 02 0011 6</td>
-                    <td>Espironolactona 25mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 08 0022 9</td>
-                    <td>Estriol 1mg/g creme vaginal bisnaga 50+aplicador - uso intravaginal - uso adulto</td>
-                    <td>Tubo</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 08 0019 9</td>
-                    <td>Estrogênios conjugados 0,3mg - drágeas - uso oral p/adultos</td>
-                    <td>Drágeas</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0076 9</td>
-                    <td>Finasterida 5MG comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 02 14 0007 3</td>
-                    <td>Fitas para hemoglicoteste - ( hgt )</td>
-                    <td>Unidade</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 02 0018 3</td>
-                    <td>Furosemida 10 mg/ml ampola 2 ml</td>
-                    <td>Ampola</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 02 0014 0</td>
-                    <td>Furosemida 40 mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 05 0001 2</td>
-                    <td>Fluconazol 150mg cápsula - uso adulto.</td>
-                    <td>Cápsula</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 12 0001 2</td>
-                    <td>Glibenclamida 5 mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0442 0</td>
-                    <td>Glicerol 2,68G supositório - uso retal - uso adulto</td>
-                    <td>Unidade</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 12 0052 7</td>
-                    <td>Gliclazida 60 mg comprimido (liberação modificada)</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0017 3</td>
-                    <td>Glicose 25% ampola 10 ml</td>
-                    <td>Ampola</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0018 1</td>
-                    <td>Glicose 50% ampola 10 ml</td>
-                    <td>Ampola</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0039 4</td>
-                    <td>Heparina Sódica 5.000ui/0,25ml AMP 0,25ml USO SC</td>
-                    <td>Ampola</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 02 0050 7</td>
-                    <td>Hidralazina, cloridrato 25mg drágea - uso adulto</td>
-                    <td>Drágeas</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 02 0006 0</td>
-                    <td>Hidroclorotiazida 25mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0029 7</td>
-                    <td>Hidrocortisona, acetato 11,2mg (equivalente a 10mg de hidrocortisona) creme - bisnaga de 20mg - uso dermatológico - uso adulto e pediátrico.</td>
-                    <td>Tubo</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0029 7</td>
-                    <td>Hidrocortisona + neomicina, sulfato + polimixina b, sulfato  gotas frasco 10 ml (tipo otosporin)</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 13 0009 2</td>
-                    <td>Hidrocortisona, succinato 500 mg frasco</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 10 0003 0</td>
-                    <td>Hidróxido de alumínio 60 mg/ml suspensão frasco 150 ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0006 8</td>
-                    <td>Hidróxido de magnésio 80 mg/ml suspensão frasco 120 ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0040 8</td>
-                    <td>Hidróxido de potássio 10% frasco 10 ml (manipulado)</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 01 0012 0</td>
-                    <td>Ibuprofeno 300mg comprimido - uso adulto</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 01 0006 5</td>
-                    <td>Ibuprofeno 50mg/ml gotas frasco 30ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 12 0005 5</td>
-                    <td>Insulina humana nph 100 ui/ml frasco 10 ml - uso adulto e pediátrico</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 12 0057 8</td>
-                    <td>Insulina humana NPH 100UI/ML Caneta descartável 3ML - uso adulto e pediátrico</td>
-                    <td>Caneta</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 12 0006 3</td>
-                    <td>Insulina humana regular 100 ui/ml frasco 10 ml - uso adulto e pediátrico</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 12 0056 0</td>
-                    <td>Insulina humana regular 100UI/ML Caneta descartável 3ML uso adulto e pediátrico</td>
-                    <td>Caneta</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 12 0035 7</td>
-                    <td>Insulina humana NPH 100 ui/ml refil 3 ml - uso adulto e pediátrico</td>
-                    <td>Refil</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 12 0034 9</td>
-                    <td>Insulina humana regular 100 ui/ml refil 3 ml - uso adulto e pediátrico</td>
-                    <td>Refil</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 11 0007 7</td>
-                    <td>Ipratrópio, brometo gotas frasco 20 ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0107 2</td>
-                    <td>Isossorbida, mononitrato 20mg comprimido - uso adulto</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 02 0016 7</td>
-                    <td>Isossorbida, dinitrato 10 mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 02 0015 9</td>
-                    <td>Isossorbida, dinitrato 5 mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 02 09 0025 0</td>
-                    <td>Lanceta para hgt</td>
-                    <td>Unidade</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0145 5</td>
-                    <td>Lactulose 1340,00mg/ml - equivalente a 667mg/ml de lactulos frasco 120 ml - uso adulto e pediátrico.</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 09 20 0121 0</td>
-                    <td>LEVODOPA 100MG + BENSERAZIDA, CLORIDRATO 25MG COMPRIMIDO BIRRANHURADO - USO ADULTO</td>
-                    <td>Unidade</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 09 12 1672 7</td>
-                    <td>LEVODOPA 100MG + BENSERAZIDA, CLORIDRATO 25MG  CAPSULA HBS - USO ADULTO</td>
-                    <td>Unidade</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 09 12 1561 5</td>
-                    <td>LEVODOPA 200MG + BENSERAZIDA, CLORIDRATO 50MG  COMPRIMIDO - USO ADULTO</td>
-                    <td>Unidade</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 09 12 1637 9</td>
-                    <td>LEVODOPA 250MG + CARBIDOPA 25MG COMPRIMIDO - USO ADULTO</td>
-                    <td>Unidade</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 08 0006 7</td>
-                    <td>Levonorgestrel 0,75 mg cartela 2 comp</td>
-                    <td>Cartela</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 08 0002 4</td>
-                    <td>Levonorgestrel+ etinilestradiol cartela 21 comp</td>
-                    <td>Cartela</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 19 0011 1</td>
-                    <td>Levotiroxina sódica 100mcg comprimido - uso adulto e pediátrico</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 19 0007 3</td>
-                    <td>Levotiroxina sódica 25mcg comprimido - uso adulto e pediátrico</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 19 0008 1</td>
-                    <td>Levotiroxina sódica 50mcg comprimido - uso adulto e pediátrico</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 09 12 2643 9</td>
-                    <td>Levotiroxina sódica 37,5mcg comprimido - uso adulto e pediátrico</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 19 0016 2</td>
-                    <td>Levotiroxina sódica 12,5mcg comprimido - uso adulto e pediátrico</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0005 0</td>
-                    <td>Lidocaína gel 100 mg/5 g tubo 30 g</td>
-                    <td>Tubo</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 13 0014 9</td>
-                    <td>Loratadina 1 mg/ml suspensão oral frasco 100 ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 13 0008 4</td>
-                    <td>Loratadina 10 mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 02 0003 5</td>
-                    <td>Losartana potássica 50mg comprimido revestido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 07 0002 0</td>
-                    <td>Mebendazol 100 mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 07 0003 8</td>
-                    <td>Mebendazol suspensão 100 mg/5 ml frasco 30 ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 08 0001 6</td>
-                    <td>Medroxiprogesterona, acetato 150 mg/ml ampola 1 ml - Uso Im</td>
-                    <td>Ampola</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 08 0024 5</td>
-                    <td>MEDROXIPROGESTERONA, ACETATO 25MG/ML + ESTRADIOL, CIPIONATO 5MG/ML SUSPENSAO INJETAVEL 0,5ML</td>
-                    <td>Ampola</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 12 0002 0</td>
-                    <td>Metformina, cloridrato 500 mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 12 0003 9</td>
-                    <td>Metformina, cloridrato 850 mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 02 0017 5</td>
-                    <td>Metildopa 250 mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 18 0010 9</td>
-                    <td>Metoclopramida, cloridrato 10 mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 18 0005 2</td>
-                    <td>Metoclopramida, cloridrato 5 mg/ml ampola 2 ml</td>
-                    <td>Ampola</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 18 0011 7</td>
-                    <td>Metoclopramida, cloridrato gotas frasco 10 ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0175 7</td>
-                    <td>Metoprolol, succinato 47,5mg - equivalente a 50MG de Metoprolol, tartarato - uso adulto</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 17 0003 1</td>
-                    <td>Metronidazol 250 mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 17 0005 8</td>
-                    <td>Metronidazol 40 mg/ml suspensão oral frasco 100 ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 17 0008 2</td>
-                    <td>Metronidazol 500 mg/5 g tubo 50 g c/ 10 aplicadores</td>
-                    <td>Tubo</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 17 0006 6</td>
-                    <td>Neomicina, sulfato + bacitracina zínica tubo 10 g</td>
-                    <td>Tubo</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 02 0019 1</td>
-                    <td>Nifedipina 20 mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 01 0003 0</td>
-                    <td>Nimesulida 100mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 01 0004 9</td>
-                    <td>Nimesulida 50mg/ml frasco 15ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 05 0002 0</td>
-                    <td>Nistatina 100.000 Ui/4 g creme vaginal tubo 60 g</td>
-                    <td>Tubo</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 07 0004 6</td>
-                    <td>Nistatina 100.000 Ui/ml suspensão oral frasco 50 ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 17 0040 6</td>
-                    <td>Nitrofurantoina 100mg cápsula</td>
-                    <td>Cápsula</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 08 0003 2</td>
-                    <td>Noretisterona 0,35 mg cartela 35 comp</td>
-                    <td>Cartela</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 08 0004 0</td>
-                    <td>Noretisterona, enantato + estradiol, valerato (50 + 5 mg/ml) ampola 1 ml - Uso Im</td>
-                    <td>Ampola</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 17 0011 2</td>
-                    <td>Norfloxacina 400 mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0004 1</td>
-                    <td>Óleo mineral 100% frasco 100 ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 10 0002 1</td>
-                    <td>Omeprazol 20 mg cápsula</td>
-                    <td>Cápsula</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 18 0013 3</td>
-                    <td>Ondansetrona 8mg - equivalente a 10mg de ondansentrona, cloridrato comprimido de desintegração oral - uso adulto e pediátrico acima de 11 anos.</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 03 0003 0</td>
-                    <td>Paracetamol 200 mg/ml gotas frasco15 ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 03 0013 7</td>
-                    <td>Paracetamol 500mg comprimido - uso adulto e pediátrico acima de 12 anos.</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0443 8</td>
-                    <td>Pasta D'água óxido de zinco 25% (250mg/g) bisnaga 80g - uso externo - uso adulto e pediátrico</td>
-                    <td>Bisnaga</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0012 2</td>
-                    <td>Permanganato de potássio 100 mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 09 12 2645 5</td>
-                    <td>Permetrina 50mg/ml loção cremosa frasco plastico</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 09 0044 4</td>
-                    <td>Polivitamínico gotas frasco 20 ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 13 0006 8</td>
-                    <td>Prednisolona, fosfato sódico 3 mg/ml suspensão frasco 100 ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 13 0003 3</td>
-                    <td>Prednisona 20 mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 13 0002 5</td>
-                    <td>Prednisona 5 mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 13 0005 0</td>
-                    <td>Prometazina, cloridrato 25 mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 13 0013 0</td>
-                    <td>Prometazina, cloridrato 25 mg/ml ampola 2 ml</td>
-                    <td>Ampola</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0119 6</td>
-                    <td>Proprafenona , cloridrato 300mg comprimido revestido - uso adulto</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 02 0013 2</td>
-                    <td>Propranolol, cloridrato 40 mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0025 4</td>
-                    <td>Sais para reidratação oral envelope 27,9 g</td>
-                    <td>Envelope</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 11 0004 2</td>
-                    <td>Salbutamol 2 mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 11 0026 3</td>
-                    <td>Salbutamol Sulfato 6MG-frasco 10ML- solução para nebulização</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 11 0009 3</td>
-                    <td>Salbutamol, sulfato 2 mg/5 ml xarope frasco 120 ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 11 0010 7</td>
-                    <td>Salbutamol, sulfato spray oral 100 mcg/dose 200 doses</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 18 0001 0</td>
-                    <td>Simeticona 75 mg/ml gotas frasco 15 ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0371 7</td>
-                    <td>Sinvastatina 20MG comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 09 12 2647 1</td>
-                    <td>Sulfadiazina de prata 1% (10mg/g) creme</td>
-                    <td>Tubo</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 17 0004 0</td>
-                    <td>Sulfametoxazol - trimetoprim 200/40 mg/5 ml suspensão frasco 100 ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 17 0020 1</td>
-                    <td>Sulfametoxazol - trimetoprim 400/80 mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 09 0008 8</td>
-                    <td>Sulfato ferroso 25 mg/ml gotas frasco 30 ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 09 0006 1</td>
-                    <td>Sulfato ferroso 300 mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 09 0007 0</td>
-                    <td>Sulfato ferroso 40 mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 19 0002 2</td>
-                    <td>Tiamazol 10 mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 09 0011 8</td>
-                    <td>Tiamina, cloridrato 300 mg comprimido</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0281 8</td>
-                    <td>Tiamina, cloridrato + piridoxina, cloridrato (Ampola I),  Cianocobalamina 5000 mcg (Ampola II) - Uso IM</td>
-                    <td>Ampola</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 20 0015 7</td>
-                    <td>Tiocolchicosídeo 2 mg/ml ampola 2 ml - Uso Im</td>
-                    <td>Ampola</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 17 0022 8</td>
-                    <td>Tobramicina 0,3% colírio frasco 5 ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 12 0004 7</td>
-                    <td>Vildagliptina 50 mg comprimido (Reposição automática mediante consumo)</td>
-                    <td>Comprimido</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 09 0045 2</td>
-                    <td>Vitamina a + d gotas frasco 20 ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 09 0004 5</td>
-                    <td>Vitamina a + d pomada tubo 45 g</td>
-                    <td>Tubo</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 01 09 0005 3</td>
-                    <td>Vitamina c 200 mg/ml gotas frasco 20 ml</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr></tbody></table><h2 style="background-color:#f0f0f0; padding:10px;">Enfermagem</h2><p><strong>Responsável:</strong> (não informado)</p><p><strong>Unidade Solicitante:</strong> (não informado)</p><p><strong>Período:</strong> (não informado)</p><table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse; width: 100%; margin-bottom: 20px;"><thead><tr>
-                <th>Código SMAR</th>
-                <th>Descrição completa</th>
-                <th>Unidade de Medida</th>
-                <th>Saldo Vivver</th>
-                <th>Consumo Médio</th>
-                <th>Sugestão de Pedido</th>
-            </tr></thead><tbody><tr>
-                    <td>1 02 12 0001 5</td>
-                    <td>Abaixador de lingua de madeira (Pacote c/ 100 unidades)</td>
-                    <td>Pacote</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 02 03 0001 6</td>
-                    <td>Ácido graxo essencial (Age)</td>
-                    <td>Frasco</td>
-                    <td>6</td>
-                    <td>3</td>
-                    <td>-3</td>
-                </tr><tr>
-                    <td>1 02 01 0004 1</td>
-                    <td>Agulha descartável hipodérmica 25 x 7 mm</td>
-                    <td>Unidade</td>
-                    <td>200</td>
-                    <td>157</td>
-                    <td>-43</td>
-                </tr><tr>
-                    <td>1 02 11 0005 3</td>
-                    <td>Álcool 70º (Antisséptico e bactericida)</td>
-                    <td>Litro</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr></tbody></table><h2 style="background-color:#f0f0f0; padding:10px;">Odonto</h2><p><strong>Responsável:</strong> (não informado)</p><p><strong>Unidade Solicitante:</strong> (não informado)</p><p><strong>Período:</strong> (não informado)</p><table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse; width: 100%; margin-bottom: 20px;"><thead><tr>
-                <th>Código SMAR</th>
-                <th>Descrição completa</th>
-                <th>Unidade de Medida</th>
-                <th>Saldo Vivver</th>
-                <th>Consumo Médio</th>
-                <th>Sugestão de Pedido</th>
-            </tr></thead><tbody><tr>
-                    <td>1 07 01 0001 0</td>
-                    <td>Ácido condicionador para resina foto</td>
-                    <td>Frasco</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 07 01 0002 9</td>
-                    <td>Agulha curta para anestesia</td>
-                    <td>Caixa</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 07 01 0086 0</td>
-                    <td>Máscara cirúrgica descartável</td>
-                    <td>Unidade</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr><tr>
-                    <td>1 07 01 0093 2</td>
-                    <td>Óxido zinco pó</td>
-                    <td>Unidade</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr></tbody></table>
+    ${htmlTables}
+</body>
+</html>`;
+
+        return htmlCompleto;
+    }
+
+    // Função para baixar o pedido completo como arquivo HTML
+    function baixarPedidoCompleto() {
+        const conteudo = gerarHtmlDoPedidoCompleto();
+        const blob = new Blob([conteudo], { type: 'text/html;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'pedido_completo.html';
+        a.click();
+
+        URL.revokeObjectURL(url);
+    }
+
+    // Event listeners e inicialização
+    document.addEventListener('DOMContentLoaded', () => {
+        // Renderiza todos os dados das abas
+        Object.entries(data).forEach(([tabKey, items]) => renderTable(tabKey, items));
+
+        // Setup troca de abas
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', () => switchTab(button.dataset.tab));
+        });
+
+        // Inicializa Google Sheets API
+        initGoogleSheets();
+
+        // Evento do botão de download
+        document.getElementById('downloadAllOrder').addEventListener('click', baixarPedidoCompleto);
+
+        // Aba padrão ativa
+        switchTab('farmacia');
+    });
+    </script>
 </body>
 </html>
